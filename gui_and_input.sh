@@ -10,11 +10,9 @@ source tools.sh
 # the value of $current_map_char_is_on points to arrays in maps.cfg to get the right map data
 get_map_info(){
 map="${maps[$current_map_char_is_on]}"
-# if we want custom x and y values, depending on where we entered the map: could come up with a function that briefly changes the config file for when we load the map, run get_map_info with these modified starting coordinates, then after it's run we change them back.
 x="${starting_x_coords[$current_map_char_is_on]}"
 y="${starting_y_coords[$current_map_char_is_on]}"
 background_art="${background_art_selection[$current_map_char_is_on]}"
-# get max_width, useful for things
 map_height=$( cat $map | wc -l )
 chars_on_map=$( cat $map | wc -c )
 # -1 so we ignore the newline character
@@ -59,20 +57,14 @@ move(){
       while read -rn1 xcharacter; do
         ((xchar_newline_count++))
         if [ "$xcount" -eq "$newx" ]; then
-          # here we test for different floor blocks if the char is standing on them
+          # these tests are made nearly redundant by the control over the map we get with map_function_conditions
           if [ "$xcharacter" == "O" -o "$xcharacter" == "~" -o "$xcharacter" == " " ]; then
             stop_flag=1
           elif [ "$xcharacter" == "w" ]; then
             grass_flag=1
-
-          # possibly no longer needed as we're controlling doors via the map_function_conditions function now
-
-          # elif [ "$xcharacter" == "[" -o "$xcharacter" == "]" ]; then
-          #   door_flag=1
           fi
           echo -n "C"
         else
-          # we can colour things in here
           echo -n $xcharacter
         fi
         ((xcount++))
@@ -128,6 +120,7 @@ right(){
 }
 
 # terrain types
+# this is slowly becoming redundant with the advent of map_function_conditions
 # w
 grass(){
   pokemon_appearing_chance=$(( ( RANDOM % 30 ) + 1 ))
@@ -145,36 +138,17 @@ stop(){ # reverse last $input so it appears the char can't move through stop
     left
   fi
 }
-# ] or [
-# load_new_map(){
-#   background_art=;
-#   # ---all doors for home_map
-#   # go to inside_house_from_home_map
-#   # if [ "$current_map_char_is_on" -eq 1 -a "$y" -eq 9 ]; then
-#   #   if [ "$x" -eq 7 -o "$x" -eq 8 ]; then
-#   #     change_conf_value "character_files/character.cfg" "current_map_char_is_on" 2
-#   #     get_new_map_info_set_starting_pos 6 4
-#   #   fi
-#   # ---all doors for inside_house_from_home_map
-#   # go to pallet_town
-#   #below should just be changed to elif once the other if statemnet is back
-#   # if [ "$current_map_char_is_on" -eq 2 -a "$y" -eq 5 ]; then
-#   #   if [ "$x" -eq 6 -o "$x" -eq 7 ]; then
-#   #     change_conf_value "character_files/character.cfg" "current_map_char_is_on" 1
-#   #     get_new_map_info_set_starting_pos 7 10
-#   #   fi
-#   # fi
-# }
 
 get_new_map_info_set_starting_pos(){
   source character_files/character.cfg
-  # get_map_info sets the default x and y for the map, however if we're coming into the map through one of the map's multiple entrance points, then the default values for the map may not make sense
+  # get_map_info sets the default x and y for the map, however if we're coming into the map through one of the map's multiple entrance points, then the default values for the map may not make sense, so the option to set them on the fly is nice, nearly makes the default starting positions for the maps redundant
   get_map_info
   x=$1
   y=$2
   move $x $y
 }
 
+# this is bullshit, get rid of this at some point
 echo "Press w a s or d to continue......."
 
 # for when we load up the game

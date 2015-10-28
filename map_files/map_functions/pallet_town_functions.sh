@@ -19,9 +19,7 @@ map_function_conditions(){
       stop
   elif [ "$newy" -eq 7 -a "$newx" -ge 7 -a "$newx" -le 14 ]; then
     stop
-  elif [ "$newy" -eq 8 -a "$newx" -ge 6 -a "$newx" -le 15 ]; then
-    stop
-  elif [ "$newy" -eq 9 -a "$newx" -ge 6 -a "$newx" -le 15 ]; then
+  elif [ "$newy" -ge 8 -a "$newy" -le 9 -a "$newx" -ge 6 -a "$newx" -le 15 ]; then
     stop
   fi
 

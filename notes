@@ -1,7 +1,0 @@
-V1) Map todo:
--draw maps (cool thing: we can draw maps that appear to be of irregular shape, by creatively using spaces!
--multiple entrances to a map:
-hacky way: store an 'new entrance point' for each map
--places on the map having special properties not defined by what the character is:
-1.separate file of functions for each map
--interaction with things on map eg. reading a sign

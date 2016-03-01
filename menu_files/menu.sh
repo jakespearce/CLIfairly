@@ -1,6 +1,6 @@
-#!bin/bash
+#!/bin/bash
 
-source menu_files/menus.cfg
+source menus.cfg
 source ${HOME}/pokemon/gui/tools.sh
 
 # echo "$hiOn $menu_item $hiOff" will result in $menu_item appearing highlighted.
@@ -9,13 +9,17 @@ hiOff=$( tput rmso )
 
 # always start with where_selection_is at 1, so we're at the top of any menu we land on
 where_selection_is=1
+
 # $current_menu will be a path to a menu file, determined by menus.cfg
 current_menu=${menu[${current_menu_in_view_x},${current_menu_in_view_y}]}
-menu_height=$( cat $current_menu | wc -l )
+menu_height=$( wc -l < $current_menu )
 cat $current_menu > /dev/shm/marked_menu
 # problem - it's not registering our 2d array COS YOU DIDN'T DECLARE IT IDIO
+
 echo $current_menu
-sleep 3
+
+sleep 2
+
 show_menu(){
   # we're expecting to see possibly 2 columns in our marked_menu. the first one is the menu item eg. ITEM, the second is a marker that determines whether that menu item appears highlighted, eg. a line in /dev/shm/marked_menu that appeared as "ITEM selected" would appear to the player as ITEM, but highlighted
   while read menu_item selected; do
@@ -61,18 +65,17 @@ select_menu_item(){
     if [ "$selected" == "selected" ]; then
       echo "you tried to open the sub menu that was on line ${count}"
       sleep 2
-      # it appears change_conf_value isn't working for us
-      change_conf_value "menu_files/menus.cfg" "current_menu_in_view_y" $count
-      change_conf_value "menu_files/menus.cfg" "current_menu_in_view_x" $(( $current_menu_in_view_x + 1 ))
-      echo $current_menu_in_view_x
-      echo $current_menu_in_view_y
+      change_conf_value "menus.cfg" "current_menu_in_view_y" $count
+      change_conf_value "menus.cfg" "current_menu_in_view_x" $(( $current_menu_in_view_x + 1 ))
       sleep 2
-      source menu_files/menus.cfg
-      current_menu=${menu[${current_menu_in_view_x},${current_menu_in_view_y}}
+      source menus.cfg
+      current_menu=${menu[${current_menu_in_view_x},${current_menu_in_view_y}]}
       echo $current_menu
       sleep 2
       # reset selection so we start at the top again, possibly do this somewhere else tho
       where_selection_is=1
+	# reset menu height
+	menu_height=$( wc -l < $current_menu )
       refresh_menu
     fi
   done < /dev/shm/marked_menu

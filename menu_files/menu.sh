@@ -1,7 +1,10 @@
 #!/bin/bash
 
-source menus.cfg
+source ${HOME}/pokemon/gui/menu_files/menus.cfg
 source ${HOME}/pokemon/gui/tools.sh
+
+# menus.cfg filepath
+menu_config="${HOME}/pokemon/gui/menu_files/menus.cfg"
 
 # echo "$hiOn $menu_item $hiOff" will result in $menu_item appearing highlighted.
 hiOn=$( tput smso )
@@ -14,12 +17,6 @@ where_selection_is=1
 current_menu=${menu[$menu_in_view]}
 menu_height=$( wc -l < $current_menu )
 cat $current_menu > /dev/shm/marked_menu
-
-
-echo $current_menu
-
-sleep 2
-
 
 # the menu item that is currently selected has 'selected' appended to the menu in marked_menu. when we read this line we turn highlighting on so it appears highlighted.
 show_menu(){  
@@ -64,8 +61,8 @@ select_menu_item(){
   while read menu_line item_number; do
     ((count++))
     if [ $where_selection_is == $count ]; then
-      change_conf_value "menus.cfg" "menu_in_view" $item_number
-      source menus.cfg
+      change_conf_value $menu_config "menu_in_view" $item_number
+      source ${HOME}/pokemon/gui/menu_files/menus.cfg
       current_menu=${menu[$menu_in_view]}
       echo $current_menu
       # reset selection so we start at the top again, possibly do this somewhere else tho
@@ -88,6 +85,7 @@ do
     w|W) where_selection_is=$(( $where_selection_is - 1 )) ;;
     s|S) where_selection_is=$(( $where_selection_is + 1 )) ;;
     # empty string is enter key
-    "") select_menu_item ;;
+    ""|d) select_menu_item ;;
+    b) change_conf_value $menu_config "menu_in_view" 0 ; clear ; exit ;;
   esac
 done

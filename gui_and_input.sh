@@ -94,6 +94,7 @@ input_prompt(){
     d) right ;;
     # interaction is a function found whatever the current_map_functions file is set to
     e) clear ; cat /dev/shm/marked_map ; echo "" ; echo -n " " ; interaction ;;
+    m) bash /home/senpai/pokemon/gui/menu_files/menu.sh ; cat /dev/shm/marked_map ;;
     *) echo "fuck off" ;;
    esac
 }

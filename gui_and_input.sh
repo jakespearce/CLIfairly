@@ -21,9 +21,9 @@ get_map_info(){
 
 	background_art="${background_art_selection[$current_map_char_is_on]}"
 
-	map_height=$( cat $map | wc -l )
+	map_height=$( wc -l < $map )
 
-	chars_on_map=$( cat $map | wc -c )
+	chars_on_map=$( wc -c < $map )
 
 	# -1 so we ignore the newline character
 	map_width=$(( $(( $chars_on_map / $map_height )) - 1 ))
@@ -35,6 +35,7 @@ get_map_info(){
 }
 
 move(){
+
 	IFS=;
 	# where we'll be if it all goes to plan
 	newx=$1
@@ -109,6 +110,7 @@ move(){
 }
 
 input_prompt(){
+
   	read -n1 input
   	case $input in
     	w) up ;;
@@ -149,12 +151,14 @@ right(){
 # THING TO DO: see if map function conditions can have an eg. 4x4 area where the grass() function applies?
 # w
 grass(){
+
   	pokemon_appearing_chance=$(( ( RANDOM % 30 ) + 1 ))
   	[ $pokemon_appearing_chance -gt 28 ] && echo "pokemon"
 }
 
 
 stop(){ # reverse last $input so it appears the char can't move through stop
+
   	if [ "$input" == "w" ]; then
     	down
   	elif [ "$input" == "s" ]; then
@@ -168,6 +172,7 @@ stop(){ # reverse last $input so it appears the char can't move through stop
 
 
 get_new_map_info_set_starting_pos(){
+
   	source character_files/character.cfg
 
   	# get_map_info sets the default x and y for the map, however if we're coming into the map through one of the map's multiple entrance points, then the default values for the map may not make sense, so the option to set them on the fly is nice, nearly makes the default starting positions for the maps redundant

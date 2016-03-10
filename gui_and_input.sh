@@ -34,6 +34,7 @@ get_map_info(){
 	source "$current_map_functions"
 }
 
+
 move(){
 
 	IFS=;
@@ -109,6 +110,7 @@ move(){
   	[[ $door_flag ]] && load_new_map || cat /dev/shm/marked_map
 }
 
+
 input_prompt(){
 
   	read -n1 input
@@ -123,6 +125,7 @@ input_prompt(){
     	*) echo "fuck off" ;;
    	esac
 }
+
 
 # we can abuse these for teleports and shit
 up(){
@@ -181,6 +184,7 @@ get_new_map_info_set_starting_pos(){
   	y=$2
   	move $x $y
 }
+
 
 # this is bullshit, get rid of this at some point
 echo "Press w a s or d to continue......."

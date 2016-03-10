@@ -1,4 +1,6 @@
 #!bin/bash
+
+
 map_function_conditions(){
 
   	# map swaps - always have to come before stops
@@ -34,3 +36,4 @@ interaction(){
     	echo "Sign post: \"Welcome to pallet town!\""
   	fi
 }
+

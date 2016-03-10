@@ -1,4 +1,6 @@
 #!bin/bash
+
+
 map_function_conditions(){
 
   	if [ "$newy" -eq 3 -a "$newx" -eq 2 ]; then

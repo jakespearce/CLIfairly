@@ -4,8 +4,8 @@ source ${HOME}/pokemon/gui/menu_files/menus.cfg
 
 source ${HOME}/pokemon/gui/tools.sh
 
-# menus.cfg filepath
-menu_config="${HOME}/pokemon/gui/menu_files/menus.cfg"
+# menu files filepath
+menu_files=${HOME}/pokemon/gui/menu_files
 
 # echo "$hiOn $menu_item $hiOff" will result in $menu_item appearing highlighted.
 hiOn=$( tput smso )
@@ -81,15 +81,10 @@ select_menu_item(){
     	((count++))
 
     	if [ $where_selection_is == $count ]; then
-      		change_conf_value $menu_config "menu_in_view" $item_number
-      		source ${HOME}/pokemon/gui/menu_files/menus.cfg
-      		current_menu=${menu[$menu_in_view]}
-      		echo $current_menu
-      		# reset selection so we start at the top again, possibly do this somewhere else tho
-      		where_selection_is=1
-			# reset menu height since we've got a new current_menu
-			menu_height=$( wc -l < $current_menu )
-      		refresh_menu
+
+			[[ $item_number == 1 ]] && bash ${menu_files}/pokedex_files/pokedex.sh
+			# TODO: THE REST
+
     	fi
 
   	done < $current_menu

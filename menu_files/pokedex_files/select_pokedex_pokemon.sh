@@ -1,0 +1,47 @@
+#!/bin/bash
+
+art_files="${HOME}/pokemon/gui/menu_files/pokedex_files/pokedex_db/art"
+
+data_files="${HOME}/pokemon/gui/menu_files/pokedex_files/pokedex_db/data"
+
+name=$1
+
+seen=$2
+
+own=$3
+
+
+# why even bother if you haven't seen it yet? smh
+if [ "$seen" -eq 0 ]; then
+	exit 0
+
+# if we've seen but don't own
+elif [ "$seen" -eq 1 -a "$own" -eq 0 ]; then
+	clear
+	cat ${art_files}/${name}.art
+	cat ${data_files}/NOT_CAUGHT.data
+	
+	read -n1 input < /dev/tty
+	clear
+	exit 0;
+
+# only other option is if we've seen AND own it
+else
+	clear
+	cat ${art_files}/${name}.art
+	cat ${data_files}/${name}1.data
+	printf '							\e[5;32;40m▼\e[m\n'
+	
+	read -n1 input < /dev/tty
+
+	clear
+	cat ${art_files}/${name}.art
+	cat ${data_files}/${name}2.data
+
+	read -n1 input < /dev/tty
+
+	clear
+	exit 0
+
+fi
+

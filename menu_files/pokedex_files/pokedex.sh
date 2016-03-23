@@ -122,6 +122,25 @@ reposition_window(){
 }
 
 
+select_pokemon(){
+
+	selected_pokemon=$1
+	
+	local count=0
+
+	while read id name seen own; do
+
+	((count++))
+
+	if [ "$count" -eq "$selected_pokemon" ]; then
+		bash "${pokedex_files}/select_pokedex_pokemon.sh" $name $seen $own
+
+	fi	
+
+	done < "${pokedex_files}/pokedex"
+}
+
+
 input_prompt(){
 
 	while :
@@ -143,7 +162,7 @@ input_prompt(){
    		    w|W) where_selection_is=$(( $where_selection_is - 1 )) ;;
         	s|S) where_selection_is=$(( $where_selection_is + 1 )) ;;
         	# empty string is enter key
-#        	""|d) select_pokemon ;;
+        	""|d) select_pokemon $where_selection_is ;;
         	a|b) clear ; exit ;;
     	esac
 

@@ -144,7 +144,7 @@ input_prompt(){
         	s|S) where_selection_is=$(( $where_selection_is + 1 )) ;;
         	# empty string is enter key
 #        	""|d) select_pokemon ;;
-        	b) clear ; exit ;;
+        	a|b) clear ; exit ;;
     	esac
 
 	done

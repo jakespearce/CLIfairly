@@ -186,8 +186,9 @@ get_new_map_info_set_starting_pos(){
 }
 
 
-# this is bullshit, get rid of this at some point
-echo "Press w a s or d to continue......."
+# clear terminal and show splash screen
+clear
+cat pokemon_logo
 
 # for when we load up the game
 get_map_info

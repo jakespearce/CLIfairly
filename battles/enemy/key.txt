@@ -1,0 +1,47 @@
+battle file format:
+What do we need for a battle?
+Stats
+Move pool
+PP for each move
+Status ailments
+
+This will be in the form of a CSV
+
+0pokemonID
+1pokemonUniqueID
+2pokemonName
+3pokemonGivenName (same as 2. for a wild or trainer owned pokemon.)
+4inventoryStatus (possibly not relevant if we store the active pokemon as a variable)
+5currentHP
+6level
+8typeOne
+9typeTwo
+10moveOne
+11moveTwo
+12moveThree
+13moveFour
+14moveOnePP
+15moveTwoPP
+16moveThreePP
+17moveFourPP
+18HP
+19attack
+20defense
+21special
+22speed
+23burn
+24freeze
+25paralysis
+26poison
+27badly poisoned
+28sleep
+29confusion
+30trapped
+31charging up (can be used for flying, dig, hyper beam, flinching (maybe))
+32seeded
+33substituted
+34flinched(?)
+
+
+
+

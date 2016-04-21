@@ -1,0 +1,56 @@
+The pokemon menu option
+
+1) we're NOT concerned with how they get here (although this might influence the format of the file)
+2) requirements:
+-should be able to select them
+-this brings up a sub-menu beneath the actual menu
+-the sub-menu has EVERY possible option for a pokemon:
+$all_HM_moves
+stats
+switch
+close
+
+-HM moves is something to think about in the future
+-stats should be stored somewhere else for the PLAYER'S captured pokemon
+-for pokemon the player captures, we create a new file for that pokemon in the player's folder
+-this folder is independent of whether it's in the computer, inventory etc.
+-that file is just named by a number
+-within that pokemon file, we have its pokemon name, the name the trainer gave it, its hp maximum, its current hp, all of its stats, what moves it knows, position in the pokemon menu.
+
+The actual list the player is presented with:
+-each time we open the pokemon menu, the list is generated from scratch
+-pokemon in the player's inventory are identified in the player's inventory file for the pokemon in their inventory
+-the player's pokemon inventory file is just another config-like file in player/inventory/ or something
+-the number representing a pokemon in the player's inventory file corresponds to a pokemon file in player/owned_pokemon or something
+-from here we read the relevant data (its max hp and its current hp, for display, and the 'given name' of the pokemon.
+-see: /character_files/owned_pokemon/X.pokemon_name
+eg. /character_files/owned_pokemon/33.VILEPLUME (id of 33, and it's a vileplume duh)
+
+todo:
+-make a pokemon data db. this db will contain all the data for all pokemon. things like base stats, art.
+-this is the 'starting point' for all pokemon generated in the game
+-when a fight commences, a pokemon appropriate for WHERE the fight commenced is generated.
+-eg. we're in pewter town and we generate a pidgey. don't generate a lvl 60 pidgey with 5000 attack. add modifiers appropriate for the area.
+
+
+
+Actual todo:
+-generate a 'fake' pokemon file (or two) initially for testing, in /character_files/owned_pokemon/
+-come up with a file format to go in /character_files/ which will detail which pokemon are in the player's inventory, and in what order. it will just be a list of numbers, where number.POKEMONNAME is the file format.
+-the pokemon menu item script will generate a pretty list based on this info.
+
+-We're getting dangerously close to pokemon generation here. Let's build a pokmon generator!
+-For this we need to have some sort of pokemon database (NOT the player owned one I wrote about earlier). This will contain all of the pokemon's base stats.
+-Pokemon should have individual attack files, and base stat files.
+-Infact, the base stat file should contain everything there is to generate a pokemon (aside from moves)
+
+
+
+
+
+
+
+
+
+
+

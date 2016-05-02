@@ -1,6 +1,6 @@
 #!/bin/bash
 
-art_files="${HOME}/pokemon/gui/menu_files/pokedex_files/pokedex_db/art"
+art_files="${HOME}/pokemon/gui/pokemon_database/art"
 
 data_files="${HOME}/pokemon/gui/menu_files/pokedex_files/pokedex_db/data"
 

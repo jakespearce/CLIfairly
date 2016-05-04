@@ -2,6 +2,7 @@
 
 pokemon_in_inventory="${HOME}/pokemon/gui/character_files/pokemon_in_inventory.csv"
 owned_pokemon="${HOME}/pokemon/gui/character_files/owned_pokemon"
+pokemon_menu_file="/dev/shm/pokemon_menu"
 
 generate_pokemon_menu(){
 
@@ -111,7 +112,6 @@ generate_pokemon_menu(){
 		# this is the whitespace that appears between the pokemon name and the level display
 		calculate_whitespace
 
-
 		draw_HPbar(){
 			filled_fraction=$(echo "${currentHPARR[$count]} / ${HPARR[$count]}" | bc -l)
 			filled_length=$( echo "($filled_fraction * 20)/1" | bc)
@@ -124,6 +124,8 @@ generate_pokemon_menu(){
 		draw_HPbar
 
 		get_ailment(){
+			# ye ol whitespace ailment
+			[[ ${majorAilmentARR[$count]} == 0 ]] && ailment="$( head -c4 < /dev/zero | tr '\0' ' ' )"
 			[[ ${majorAilmentARR[$count]} == 1 ]] && ailment="BRN"
 			[[ ${majorAilmentARR[$count]} == 2 ]] && ailment="FRZ"
 			[[ ${majorAilmentARR[$count]} == 3 ]] && ailment="PAR"
@@ -132,12 +134,15 @@ generate_pokemon_menu(){
 			[[ ${majorAilmentARR[$count]} == 5 ]] && ailment="PSN"
 			[[ ${majorAilmentARR[$count]} == 6 ]] && ailment="SLP"
 		}
+
 		# get ailment for display
 		get_ailment
-
-		echo "0 ${pokemonGivenNameARR[$count]}${whitespace}L:${levelARR[$count]}${ailment}" >> menu.testing
-		echo "0 HP:${populated_HPbar}${unpopulated_HPbar}  ${currentHPARR[$count]} / ${HPARR[$count]}" >> menu.testing
-		echo " " >> menu.testing
+		echo " " >> $pokemon_menu_file
+		echo "0 ${pokemonGivenNameARR[$count]}${whitespace}L:${levelARR[$count]}${ailment}" >> $pokemon_menu_file
+		echo "0 HP:${populated_HPbar}${unpopulated_HPbar}  ${currentHPARR[$count]} / ${HPARR[$count]}" >> $pokemon_menu_file
+		# the moves below are space seperated.
+		# we use these in interact_pokemon_menu.sh to generate a submenu that potentially contains HM moves.
+		echo "${moveOneARR[$count]} ${moveTwoARR[$count]} ${moveThreeARR[$count]} ${moveFourARR[$count]}" >> $pokemon_menu_file
 
 		unset ailment
 		((count++))
@@ -157,5 +162,5 @@ generate_pokemon_menu(){
 # it would be smart to have a line for each pokemon that ISN'T present in the gui of this script that contains data for the smaller sub-menu, such as HM moves for example.
 
 generate_pokemon_menu
-cat menu.testing
-rm menu.testing
+#cat $pokemon_menu_file
+#rm menu.testing

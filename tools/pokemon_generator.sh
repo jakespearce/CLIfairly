@@ -103,8 +103,9 @@ while read -r move_id; do
 
 	# construct filepaths to scripts for each attack
 	((move_count++))
-	move_index[$move_count]="${move_script_path}${move_id}"
-
+	# commented out because setting the move as the full path to the script is kinda dumb
+	#move_index[$move_count]="${move_script_path}${move_id}"
+	move_index[$move_count]="${move_id}"
 	# while we're here we may as well grab the base PP values for each attack while we're here
 	IFS='	'
 	while read move_id_ move_name_ move_type_ PP_; do
@@ -156,7 +157,7 @@ unset count
 battle_file="${battle_path}${pokemonUniqueID}.${pokemonID}"
 touch "$battle_file"
 zeroValue=0;
-for value in $pokemonID $pokemonUniqueID $pokemonName $pokemonName $zeroValue $HP $level $typeOne $typeTwo "${move_index[1]}.sh" "${move_index[2]}.sh" "${move_index[3]}.sh" "${move_index[4]}.sh" $PP_1 $PP_2 $PP_3 $PP_4 $HP $attack $defense $special $speed $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue; do
+for value in $pokemonID $pokemonUniqueID $pokemonName $pokemonName $zeroValue $HP $level $typeOne $typeTwo ${move_index[1]} ${move_index[2]} ${move_index[3]} ${move_index[4]} $PP_1 $PP_2 $PP_3 $PP_4 $HP $attack $defense $special $speed $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue; do
 # the space after $value is a tab.
 echo -n "$value	" >> $battle_file
 done

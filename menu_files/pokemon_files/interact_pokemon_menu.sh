@@ -7,6 +7,7 @@ pokemon_menu_file="/dev/shm/pokemon_menu"
 menu_height=$( wc -l < "$pokemon_menu_file" )
 generate_pokemon_menu_script="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_menu.sh"
 moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.csv" # this should be a .tab file tbh
+pokemon_submenu="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_submenu.sh"
 
 # prep
 [[ -e "$pokemon_menu_file" ]] && rm "$pokemon_menu_file"
@@ -58,10 +59,12 @@ generate_submenu(){
 	submenu="/dev/shm/submenu_pokemon_menu"
 	count=0
 	moves_line=$(( $where_selection_is + 2 ))
+	# we're checking each of the pokemon's moves for HM moves.
+	# if one of the moves is a HM move, we add the HM move to the submenu.
 	while read moveOne moveTwo moveThree moveFour; do
+
 		((count++))
 		if [ "$count" -eq "$moves_line" ]; then
-			# find the line in moves.csv that
 
 			IFS_OLD=$IFS
 			# IFS = tab
@@ -69,7 +72,8 @@ generate_submenu(){
 			for move in $moveOne $moveTwo $moveThree $moveFour; do
 				while read move_id move_name TM_HM PP; do
 					if [ "$move" -eq "$move_id" -a "$TM_HM" == "HM"  ]; then
-						echo "$move_name" > "$submenu"
+						echo -n "$move_name " | tr [a-z] [A-Z] > "$submenu"
+						echo "$move_id" >> "$submenu"
 					fi
 				done < "$moves_file"
 			done
@@ -82,9 +86,6 @@ generate_submenu(){
 	echo "SWITCH" >> "$submenu"
 	echo "CANCEL" >> "$submenu"
 
-	cat "$submenu"
-	sleep 5
-	rm "$submenu"
 
 }
 
@@ -98,14 +99,13 @@ do
 
 	clear
 	keep_selection_in_range
-	#refresh_menu
 	display_menu
 	text_prompt
 	read -n1 input < /dev/tty
 	case $input in
 	w) where_selection_is=$(( $where_selection_is -4 )) ;;
 	s) where_selection_is=$(( $where_selection_is +4 )) ;;
-	d) generate_submenu ;;
+	d) generate_submenu ; echo "$where_selection_is" > where_selection_is_pokemon_menu ; bash "$pokemon_submenu" ;;
 	a) clear ; exit ;;
 	esac
 done

@@ -59,8 +59,7 @@ generate_pokemon_menu(){
 
 	while [ "$countdown" -lt "$pokemon_count" ]; do
 		((countdown++))	
-
-	echo "${pokemon_file_location[$countdown]}"
+	
 		while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ HP_ attack_ defence_ special_ speed_ majorAilment_ confusion_ trapped_ chargingUp_ substituted_ flinched_; do
 			pokemonIDARR[$countdown]="$pokemonID_"
 			pokemonUniqueIDARR[$countdown]="$pokemonUniqueID_"

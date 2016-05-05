@@ -80,7 +80,7 @@ select_menu_item(){
 
     	((count++))
 
-    	if [ $where_selection_is == $count ]; then
+   	if [ $where_selection_is == $count ]; then
 
 			[[ $item_number == 1 ]] && bash ${menu_files}/pokedex_files/pokedex.sh
 			[[ $item_number == 2 ]] && bash ${menu_files}/pokemon_files/interact_pokemon_menu.sh

@@ -75,11 +75,9 @@ select_menu_item(){
 				echo "temp dev - $HM_id"
 				sleep 2
 			else
-				# todo: the stats script and the switch script. bug town right here.
-				echo "temp dev - this is where the "${line_item}" script would be called"
-				[[ $line_item == "STATS" ]] &&  bash "$stats" ; exit
-				[[ $line_item == "SWITCH" ]] &&  bash "$switch" ; exit
-				[[ $line_item == "CANCEL" ]] &&  rm "$pokemon_submenu_file" ; exit 
+				[[ "$line_item" = "STATS" ]] &&  bash "${HOME}/pokemon/gui/menu_files/pokemon_files/stats.sh"
+				[[ "$line_item" = "SWITCH" ]] && bash "${HOME}/pokemon/gui/menu_files/pokemon_files/switch.sh" ; rm "$pokemon_submenu_file"
+				[[ "$line_item" = "CANCEL" ]] &&  rm "$pokemon_submenu_file" ; exit 
 			fi
 		fi
 
@@ -98,7 +96,7 @@ do
     case $input in
     w) where_selection_is=$(( $where_selection_is -1 )) ;;
     s) where_selection_is=$(( $where_selection_is +1 )) ;;
-    d) select_menu_item  ;;
+    d) select_menu_item ;;
     a) clear ; rm "$pokemon_submenu_file" ; exit ;;
     esac
 done

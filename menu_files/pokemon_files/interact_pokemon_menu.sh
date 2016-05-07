@@ -10,7 +10,7 @@ moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.csv" # this 
 pokemon_submenu="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_submenu.sh"
 
 # prep
-[[ -e "$pokemon_menu_file" ]] && rm "$pokemon_menu_file"
+#[[ -e "$pokemon_menu_file" ]] && rm "$pokemon_menu_file"
 bash "$generate_pokemon_menu_script"
 
 display_menu() {
@@ -61,7 +61,7 @@ generate_submenu(){
 	moves_line=$(( $where_selection_is + 2 ))
 	# we're checking each of the pokemon's moves for HM moves.
 	# if one of the moves is a HM move, we add the HM move to the submenu.
-	while read moveOne moveTwo moveThree moveFour; do
+	while read moveOne moveTwo moveThree moveFour pokemonUniqueID; do
 
 		((count++))
 		if [ "$count" -eq "$moves_line" ]; then

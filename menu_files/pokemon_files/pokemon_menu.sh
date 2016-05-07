@@ -6,6 +6,8 @@ pokemon_menu_file="/dev/shm/pokemon_menu"
 
 generate_pokemon_menu(){
 
+	[[ -e "$pokemon_menu_file" ]] && rm "$pokemon_menu_file"
+
 	# this loop saves the file names so we can extract data from each file later
 	pokemon_count=0
 	declare -a pokemon_file_location
@@ -141,7 +143,7 @@ generate_pokemon_menu(){
 		echo "0 HP:${populated_HPbar}${unpopulated_HPbar}  ${currentHPARR[$count]} / ${HPARR[$count]}" >> $pokemon_menu_file
 		# the moves below are space seperated.
 		# we use these in interact_pokemon_menu.sh to generate a submenu that potentially contains HM moves.
-		echo "${moveOneARR[$count]} ${moveTwoARR[$count]} ${moveThreeARR[$count]} ${moveFourARR[$count]}" >> $pokemon_menu_file
+		echo "${moveOneARR[$count]} ${moveTwoARR[$count]} ${moveThreeARR[$count]} ${moveFourARR[$count]} ${pokemonUniqueIDARR[$count]}" >> $pokemon_menu_file
 
 		unset ailment
 		((count++))

@@ -7,7 +7,7 @@ move_file=$2 # /pokemon/gui/pokemon_database/move_list/001.movesBULBASAUR
 # still undecided on where level value will come from.
 level=$3
 move_script_path="${HOME}/pokemon/gui/pokemon_database/common/moves/move_scripts/"
-move_data_path="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.csv"
+move_data_path="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.tab"
 ID_counter_path="${HOME}/pokemon/gui/pokemon_database/common/ID_counter"
 battle_path="${HOME}/pokemon/gui/battles/enemy/"
 
@@ -199,31 +199,3 @@ echo "" >> $battle_file
 #37defenseEV
 #38specialEV
 #39speedEV
-
-#----- delete this --------#
-# next - displaying a set of pokemon in the players inventory.
-
-# what's the battle file looking like then?
-# pokemonUniqueID
-# pokemon common ID
-# all base stats
-# script paths that lead to move.sh files
-# PP for each move (how to ID the move the PP belongs to, though?)
-# an inventory status that is always written as 0
-# an entry for each status ailment that is initially populated with 0
-# current hp ( which is = to hp stat)
-
-# todo: moves, pp, currentHP (we'll need this in battle), name, whether we can catch it or not.
-# how do we generate moves?
-# 1 - get the level of the enemy pokemon. find the most recent 4 moves it knows from /pokemon_database/move_list/xxx.movesPOKEMONNAME
-# 2 - get data on the moves the pokemon knows from /pokemon_database/common/moves/moves.csv
-#???
-# write all of this data to a pokemon battle file. this file is only used/read when the pokemon is in battle.
-#TODO write something that writes moves to the pokemon battle file
-# moves: 
-# a move in the file is represented by an index in an array that points to a directory full of scripts that are just named with numbers. The index corresponds to script we run for each move.
-# Say 'poison sting' is used. the poison sting script calls the damage script, passing it a damage parameter. Poison sting also calls the poison script, passing it a parameter for the % of the opponent getting poisoned.
-# Therefore, for the sake of this pokemon generation script, we just need to write the correct numbers to the right place in /pokemon/gui/battles/enemy directory
-# This nearly renders the /pokemon/gui/pokemon_database/common/moves/moves.csv file useless, aside from:
-# PP, which is definitely an attribute of the pokemon rather than the move.
-# I think we still need moves.csv, but only keep PP, name, type (HM or TM)  and id of the move (which corresponds to the name of the move's script file.) Name will come in handy for the pokemon menu item, as well as when we need to use HM's, PP up and other similar items outside of battlle.

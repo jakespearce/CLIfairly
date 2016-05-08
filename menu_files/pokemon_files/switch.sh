@@ -7,11 +7,12 @@ pokemon_in_inventory="${HOME}/pokemon/gui/character_files/pokemon_in_inventory.c
 pokemon_menu_directory="${HOME}/pokemon/gui/menu_files/pokemon_files"
 pokemon_menu_file="/dev/shm/pokemon_menu"
 menu_height=$( wc -l < "$pokemon_menu_file" )
+where_selection_is_pokemon_menu="${HOME}/pokemon/gui/menu_files/pokemon_files/where_selection_is_pokemon_menu"
 
 # we'll use this postion value for the pokemon we selected to switch
 while read line; do
     pokemon_menu_position="$line"
-done < where_selection_is_pokemon_menu
+done < "$where_selection_is_pokemon_menu"
 # our starting position for this script will be the same starting position as where the pokemon to switch is
 where_selection_is=$pokemon_menu_position
 
@@ -80,10 +81,8 @@ display_pokemon_menu() {
     count=0;
     while read -r line; do
         ((count++))
-        divisible_four=$(( $count % 4 ))
-        if [ "$divisible_four" -eq 0 ]; then
-            : # no-op command
-        else
+        if [ $(( $count % 4 )) -ne 0 ]; then
+
             upper_limit_selection=$(( $pokemon_menu_position + 1 ))
 			upper_limit_new_position=$(( $where_selection_is + 1 ))
             if [ "$count" -ge "$pokemon_menu_position" -a "$count" -le "$upper_limit_selection" ]; then

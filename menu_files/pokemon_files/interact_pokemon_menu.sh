@@ -4,11 +4,12 @@ where_selection_is=2
 pokemon_menu_file="/dev/shm/pokemon_menu"
 menu_height=$( wc -l < "$pokemon_menu_file" )
 generate_pokemon_menu_script="${HOME}/pokemon/gui/menu_files/pokemon_files/generate_menu_gui.sh"
-moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.csv" # this should be a .tab file tbh
+moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.tab"
 pokemon_submenu="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_submenu.sh"
 menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
 source "$menu_tools"
 selection_adjuster=4
+where_selection_is_pokemon_menu="${HOME}/pokemon/gui/menu_files/pokemon_files/where_selection_is_pokemon_menu"
 
 bash "$generate_pokemon_menu_script"
 
@@ -87,7 +88,7 @@ do
 	case $input in
 	w) where_selection_is=$(( $where_selection_is -4 )) ;;
 	s) where_selection_is=$(( $where_selection_is +4 )) ;;
-	d) generate_submenu ; echo "$where_selection_is" > where_selection_is_pokemon_menu ; bash "$pokemon_submenu" ;;
+	d) generate_submenu ; echo "$where_selection_is" > "$where_selection_is_pokemon_menu" ; bash "$pokemon_submenu" ;;
 	a) clear ; exit ;;
 	esac
 done

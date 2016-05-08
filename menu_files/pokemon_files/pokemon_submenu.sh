@@ -12,10 +12,11 @@ menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
 source "$menu_tools"
 # used for keeping the menu selection in range
 selection_adjuster=1
+where_selection_is_pokemon_menu="${HOME}/pokemon/gui/menu_files/pokemon_files/where_selection_is_pokemon_menu"
 
 while read line; do
 	pokemon_menu_position="$line"
-done < where_selection_is_pokemon_menu
+done < "$where_selection_is_pokemon_menu"
 
 #make some decisions about what each item does. 
 display_submenu(){

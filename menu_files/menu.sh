@@ -10,6 +10,7 @@ menu_files="${HOME}/pokemon/gui/menu_files"
 # always start with where_selection_is at 1, so we're at the top of any menu we land on
 where_selection_is=1
 # $current_menu will be a path to a menu file, determined by menus.cfg
+# this is purely the gui component of the main menu.
 current_menu=${menu[$menu_in_view]}
 menu_height=$( wc -l < $current_menu )
 cat $current_menu > /dev/shm/marked_menu
@@ -46,17 +47,18 @@ refresh_menu(){
 }
 
 
-# this is where the user hits enter and opens a sub-menu. 
+# this is where the user hits d and opens a sub-menu. 
 # essentially we: grab the item_number (a value in the 2nd column of any menu file)
 # the item number tells us which menu to load next. deciding which file to load is decided by menus.cfg
 # eg. item_numer=8332. menus.cfg loads menu[8332]. menu[8332] points to a menu file. 
+# THE ABOVE IS POTENTIALLY DEPRECATED but I like the description, a similar system could be put to better use elsewhere.
 select_menu_item(){
 
   	local count=;
 
   	while read menu_line item_number; do
 
-    	((count++))
+    ((count++))
    	if [ $where_selection_is == $count ]; then
 
 			[[ $item_number == 1 ]] && bash ${menu_files}/pokedex_files/pokedex.sh

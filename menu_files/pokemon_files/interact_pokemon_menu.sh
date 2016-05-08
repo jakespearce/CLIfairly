@@ -8,6 +8,9 @@ menu_height=$( wc -l < "$pokemon_menu_file" )
 generate_pokemon_menu_script="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_menu.sh"
 moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.csv" # this should be a .tab file tbh
 pokemon_submenu="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_submenu.sh"
+menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
+source "$menu_tools"
+selection_adjuster=4
 
 # prep
 #[[ -e "$pokemon_menu_file" ]] && rm "$pokemon_menu_file"
@@ -33,18 +36,6 @@ display_menu() {
 		fi
 	done < "$pokemon_menu_file"
 	IFS=$IFS_OLD
-}
-
-# make sure we don't fly off the menu
-keep_selection_in_range(){
-
-  # replace these with builtin tests
-    if [ "$where_selection_is" -lt 1 ]; then
-        where_selection_is=$(( $where_selection_is + 4 ))
-    elif [ "$where_selection_is" -gt "$menu_height" ]; then
-        where_selection_is=$(( $where_selection_is - 4 ))
-    fi  
-
 }
 
 text_prompt(){
@@ -98,7 +89,7 @@ while :
 do
 
 	clear
-	keep_selection_in_range
+	keep_selection_in_range "$where_selection_is" "$selection_adjuster"
 	display_menu
 	text_prompt
 	read -n1 input < /dev/tty

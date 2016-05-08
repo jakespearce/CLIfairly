@@ -3,6 +3,9 @@
 source ${HOME}/pokemon/gui/menu_files/menus.cfg
 
 source ${HOME}/pokemon/gui/tools.sh
+menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
+selection_adjuster=1
+source "$menu_tools"
 
 # menu files filepath
 menu_files=${HOME}/pokemon/gui/menu_files
@@ -55,19 +58,6 @@ refresh_menu(){
 }
 
 
-# make sure we don't fly off the menu
-keep_selection_in_range(){
-
-  # replace these with builtin tests
-  	if [ "$where_selection_is" -lt 1 ]; then
-    	where_selection_is=$(( $where_selection_is + 1 ))
-  	elif [ "$where_selection_is" -gt "$menu_height" ]; then
-    	where_selection_is=$(( $where_selection_is - 1 ))
-  	fi
-
-}
-
-
 # this is where the user hits enter and opens a sub-menu. 
 # essentially we: grab the item_number (a value in the 2nd column of any menu file)
 # the item number tells us which menu to load next. deciding which file to load is decided by menus.cfg
@@ -96,7 +86,7 @@ while :
 do
 
 	clear
- 	keep_selection_in_range
+ 	keep_selection_in_range "$where_selection_is" "$selection_adjuster"
   	refresh_menu
   	show_menu
 

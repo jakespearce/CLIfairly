@@ -1,15 +1,14 @@
 #!/bin/bash
 
 source ${HOME}/pokemon/gui/tools.sh
-
 pokedex_files=${HOME}/pokemon/gui/menu_files/pokedex_files
-
 # echo "$hiOn $menu_item $hiOff" will result in $menu_item appearing highlighted.
 hiOn=$( tput smso  )
-
 hiOff=$( tput rmso  )
-
 where_selection_is=1
+menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
+source "$menu_tools"
+selection_adjuster=1
 
 # for explanations on what these poorly named variables are see line 106.
 # tl;dr the value of F determines how many menu items a player sees at any given time. we only show a small window of menu items at any given time because showing all 151 pokedex menu lines at once would be silly.
@@ -18,18 +17,7 @@ B=1
 F=7
 
 # could hard code 151 BUT WE GOTTA THINK OF THE SEQUEL BABY
-pokedex_height=$( wc -l < "${pokedex_files}/pokedex"  )
-
-
-keep_selection_in_range(){
-
-  # replace these with builtin tests
-    if [ "$where_selection_is" -lt 1 ]; then
-        where_selection_is=$(( $where_selection_is + 1 ))
-    elif [ "$where_selection_is" -gt "$pokedex_height" ]; then
-        where_selection_is=$(( $where_selection_is - 1 ))
-    fi
-}
+menu_height=$( wc -l < "${pokedex_files}/pokedex"  )
 
 
 # for displaying the pokedex when we first run pokedex.sh
@@ -115,7 +103,7 @@ reposition_window(){
 		B=$(( $B - 1 ))
 		F=$(( $F - 1 ))
 	
-	elif [ "$where_selection_is" -gt "$F" -a "$F" -ne "$pokedex_height" ]; then
+	elif [ "$where_selection_is" -gt "$F" -a "$F" -ne "$menu_height" ]; then
 		B=$(( $B + 1  ))
 		F=$(( $F + 1 ))
 	fi
@@ -147,7 +135,7 @@ input_prompt(){
 	do 
 
 		clear
-		keep_selection_in_range
+		keep_selection_in_range "$where_selection_is" "$selection_adjuster"
 		refresh_pokedex
 		show_pokedex
 

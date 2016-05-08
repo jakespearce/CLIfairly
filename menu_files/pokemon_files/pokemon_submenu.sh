@@ -8,7 +8,10 @@ menu_height=$( wc -l < "$pokemon_submenu_file" )
 where_selection_is=1
 switch="${HOME}/pokemon/gui/menu_files/pokemon_files/switch.sh"
 stats="${HOME}/pokemon/gui/menu_files/pokemon_files/stats.sh"
-
+menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
+source "$menu_tools"
+# used for keeping the menu selection in range
+selection_adjuster=1
 
 while read line; do
 	pokemon_menu_position="$line"
@@ -51,19 +54,6 @@ display_pokemon_menu() {
     IFS=$IFS_OLD
 }
 
-
-# make sure we don't fly off the menu
-keep_selection_in_range(){
-
-  # replace these with builtin tests
-    if [ "$where_selection_is" -lt 1 ]; then
-        where_selection_is=$(( $where_selection_is + 1 ))
-    elif [ "$where_selection_is" -gt "$menu_height" ]; then
-        where_selection_is=$(( $where_selection_is - 1 ))
-    fi
-
-}
-
 select_menu_item(){
 
 	count=0
@@ -88,7 +78,7 @@ while :
 do
 
     clear
-    keep_selection_in_range
+    keep_selection_in_range "$where_selection_is" "$selection_adjuster"
     display_pokemon_menu
 	echo " "
     display_submenu

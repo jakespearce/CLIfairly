@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# visual component:
 # user selects a pokemon using 'switch'. the user should be able to navigate the menu normally and select another pokemon for the switch. 
 # at this point we simply swap the ordering of the values in /gui/character_files/pokemon_in_inventory.csv
 # we then re-generate the gui component of the pokemon menu.
@@ -14,9 +13,12 @@ menu_height=$( wc -l < "$pokemon_menu_file" )
 while read line; do
     pokemon_menu_position="$line"
 done < where_selection_is_pokemon_menu
-
 # our starting position for this script will be the same starting position as where the pokemon to switch is
 where_selection_is=$pokemon_menu_position
+
+menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
+source "$menu_tools"
+selection_adjuster=4
 
 # todo: get the pokemonUniqueID for the pokemon that corresponds to where_selection_is
 # i don't think this needs to be a function
@@ -94,18 +96,6 @@ display_pokemon_menu() {
     IFS=$IFS_OLD
 }
 
-# make sure we don't fly off the menu
-keep_selection_in_range(){
-
-  # replace these with builtin tests
-    if [ "$where_selection_is" -lt 1 ]; then
-        where_selection_is=$(( $where_selection_is + 4 ))
-    elif [ "$where_selection_is" -gt "$menu_height" ]; then
-        where_selection_is=$(( $where_selection_is - 4 ))
-    fi
-
-}
-
 text_prompt(){
 
     echo "o----------------------------------o"
@@ -118,7 +108,7 @@ while :
 do
 
     clear
-    keep_selection_in_range
+    keep_selection_in_range "$where_selection_is" "$selection_adjuster"
     display_pokemon_menu
     text_prompt
 	get_the_swapee
@@ -130,6 +120,4 @@ do
     a) clear ; exit ;;
     esac
 done
-
-# todo: we need to write the swap function.
 

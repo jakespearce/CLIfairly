@@ -1,28 +1,17 @@
 #!/bin/bash
 
 source ${HOME}/pokemon/gui/menu_files/menus.cfg
-
 source ${HOME}/pokemon/gui/tools.sh
 menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
 selection_adjuster=1
 source "$menu_tools"
-
 # menu files filepath
-menu_files=${HOME}/pokemon/gui/menu_files
-
-# echo "$hiOn $menu_item $hiOff" will result in $menu_item appearing highlighted.
-hiOn=$( tput smso )
-
-hiOff=$( tput rmso )
-
+menu_files="${HOME}/pokemon/gui/menu_files"
 # always start with where_selection_is at 1, so we're at the top of any menu we land on
 where_selection_is=1
-
 # $current_menu will be a path to a menu file, determined by menus.cfg
 current_menu=${menu[$menu_in_view]}
-
 menu_height=$( wc -l < $current_menu )
-
 cat $current_menu > /dev/shm/marked_menu
 
 
@@ -36,7 +25,6 @@ show_menu(){
     	else
       		echo "$menu_item"
     	fi
-
   	done < /dev/shm/marked_menu
 }
 
@@ -69,15 +57,12 @@ select_menu_item(){
   	while read menu_line item_number; do
 
     	((count++))
-
    	if [ $where_selection_is == $count ]; then
 
 			[[ $item_number == 1 ]] && bash ${menu_files}/pokedex_files/pokedex.sh
 			[[ $item_number == 2 ]] && bash ${menu_files}/pokemon_files/interact_pokemon_menu.sh
 			# TODO: THE REST
-
     	fi
-
   	done < $current_menu
 }
 
@@ -100,3 +85,4 @@ do
   	esac
 
 done
+

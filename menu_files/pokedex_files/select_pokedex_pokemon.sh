@@ -1,15 +1,10 @@
 #!/bin/bash
 
 art_files="${HOME}/pokemon/gui/pokemon_database/art"
-
 data_files="${HOME}/pokemon/gui/menu_files/pokedex_files/pokedex_db/data"
-
 name=$1
-
 seen=$2
-
 own=$3
-
 
 # why even bother if you haven't seen it yet? smh
 if [ "$seen" -eq 0 ]; then

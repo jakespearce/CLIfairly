@@ -1,20 +1,17 @@
 #!/bin/bash
 
 where_selection_is=2
-hiOn=$( tput smso )
-hiOff=$( tput rmso )
 pokemon_menu_file="/dev/shm/pokemon_menu"
 menu_height=$( wc -l < "$pokemon_menu_file" )
-generate_pokemon_menu_script="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_menu.sh"
+generate_pokemon_menu_script="${HOME}/pokemon/gui/menu_files/pokemon_files/generate_menu_gui.sh"
 moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.csv" # this should be a .tab file tbh
 pokemon_submenu="${HOME}/pokemon/gui/menu_files/pokemon_files/pokemon_submenu.sh"
 menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
 source "$menu_tools"
 selection_adjuster=4
 
-# prep
-#[[ -e "$pokemon_menu_file" ]] && rm "$pokemon_menu_file"
 bash "$generate_pokemon_menu_script"
+
 
 display_menu() {
 
@@ -22,11 +19,9 @@ display_menu() {
 	IFS=""
 	count=0;
 	while read -r line; do
+
 		((count++))
-		divisible_four=$(( $count % 4 ))
-		if [ "$divisible_four" -eq 0 ]; then
-			: # no-op command
-		else
+		if [ $(( $count % 4 )) -ne 0 ]; then
 			upper_limit_selection=$(( $where_selection_is + 1 ))
 			if [ "$count" -ge "$where_selection_is" -a "$count" -le "$upper_limit_selection" ]; then
 				echo $hiOn $line $hiOff
@@ -38,12 +33,14 @@ display_menu() {
 	IFS=$IFS_OLD
 }
 
+
 text_prompt(){
 
 	echo "o----------------------------------o"
 	echo "|        Choose a pokemon          |"
 	echo "o----------------------------------o"
 }
+
 
 generate_submenu(){
 
@@ -76,14 +73,8 @@ generate_submenu(){
 	echo "STATS" >> "$submenu"
 	echo "SWITCH" >> "$submenu"
 	echo "CANCEL" >> "$submenu"
-
-
 }
 
-# should bring up a sub-menu
-#select_menu_item(){
-
-#}
 
 while :
 do
@@ -100,9 +91,4 @@ do
 	a) clear ; exit ;;
 	esac
 done
-
-
-# todo: we need to write the 'actual' menu to a file at some point. We need to cat it every now and again when we need to clear the screen (eg. annoying input characters appearing)
-# moves.csv needs to be refactored: moves.tab
-# this sub menu is essentially ANOTHER menu script entirely. The trick is to just keep 'cat'ing the 'pokemon menu' on top of it as we interact with the submenu.
 

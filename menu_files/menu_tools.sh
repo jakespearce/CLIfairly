@@ -2,6 +2,9 @@
 
 # this script contains functions common to different menu files.
 
+hiOn=$( tput smso )
+hiOff=$( tput rmso )
+
 # make sure we don't fly off the menu
 keep_selection_in_range(){
 

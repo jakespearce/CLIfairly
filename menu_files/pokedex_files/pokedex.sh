@@ -2,9 +2,6 @@
 
 source ${HOME}/pokemon/gui/tools.sh
 pokedex_files=${HOME}/pokemon/gui/menu_files/pokedex_files
-# echo "$hiOn $menu_item $hiOff" will result in $menu_item appearing highlighted.
-hiOn=$( tput smso  )
-hiOff=$( tput rmso  )
 where_selection_is=1
 menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
 source "$menu_tools"
@@ -13,12 +10,10 @@ selection_adjuster=1
 # for explanations on what these poorly named variables are see line 106.
 # tl;dr the value of F determines how many menu items a player sees at any given time. we only show a small window of menu items at any given time because showing all 151 pokedex menu lines at once would be silly.
 B=1
-
 F=7
 
 # could hard code 151 BUT WE GOTTA THINK OF THE SEQUEL BABY
 menu_height=$( wc -l < "${pokedex_files}/pokedex"  )
-
 
 # for displaying the pokedex when we first run pokedex.sh
 # this is pretty much the refresh_menu function from menu.sh
@@ -112,17 +107,14 @@ reposition_window(){
 
 select_pokemon(){
 
-	selected_pokemon=$1
-	
+	selected_pokemon=$1	
 	local count=0
 
 	while read id name seen own; do
 
 	((count++))
-
 	if [ "$count" -eq "$selected_pokemon" ]; then
 		bash "${pokedex_files}/select_pokedex_pokemon.sh" $name $seen $own
-
 	fi	
 
 	done < "${pokedex_files}/pokedex"
@@ -158,5 +150,4 @@ input_prompt(){
 }
 
 input_prompt
-
 

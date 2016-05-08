@@ -2,14 +2,13 @@
 
 # user selects a pokemon using 'switch'. the user should be able to navigate the menu normally and select another pokemon for the switch. 
 # at this point we simply swap the ordering of the values in /gui/character_files/pokemon_in_inventory.csv
-# we then re-generate the gui component of the pokemon menu.
+# we then re-generate the gui component of the pokemon menu now that our pokemon are in the desired order.
 pokemon_in_inventory="${HOME}/pokemon/gui/character_files/pokemon_in_inventory.csv"
 pokemon_menu_directory="${HOME}/pokemon/gui/menu_files/pokemon_files"
-hiOn=$( tput smso )
-hiOff=$( tput rmso )
 pokemon_menu_file="/dev/shm/pokemon_menu"
 menu_height=$( wc -l < "$pokemon_menu_file" )
-# we'll use this postion value for the pokemon we selected for the switch
+
+# we'll use this postion value for the pokemon we selected to switch
 while read line; do
     pokemon_menu_position="$line"
 done < where_selection_is_pokemon_menu
@@ -21,20 +20,21 @@ source "$menu_tools"
 selection_adjuster=4
 
 # todo: get the pokemonUniqueID for the pokemon that corresponds to where_selection_is
-# i don't think this needs to be a function
+# i don't think this needs to be a function - we only ever run this once.
 get_pokemon_to_swap(){
 
-	count=0
+	local count=0
 	target_line=$(( $where_selection_is + 2 ))
+
 	while read moveOne moveTwo moveThree moveFour pokemonUniqueID; do
 		((count++))
 		if [ "$count" -eq "$target_line" ]; then
 			pokemonUniqueID_to_swap="$pokemonUniqueID"
 		fi
 	done < "$pokemon_menu_file"
-
 }
 get_pokemon_to_swap
+
 
 get_the_swapee(){
 
@@ -48,6 +48,9 @@ get_the_swapee(){
     done < "$pokemon_menu_file"
 }
 
+
+# this function swaps the two pokemonUniqueIDs in the $pokemon_in_inventory file.
+# it then regenerates the pokemon menu now that the pokemon are in the desired order.
 the_swap(){
 
 	temp_pokemon_in_inventory="${pokemon_menu_directory}/temp_pokemon_in_inventory.csv"
@@ -67,8 +70,7 @@ the_swap(){
 
 	mv "$temp_pokemon_in_inventory" "$pokemon_in_inventory"
 	clear
-	bash "${pokemon_menu_directory}/pokemon_menu.sh"
-
+	bash "${pokemon_menu_directory}/generate_menu_gui.sh"
 }
 
 display_pokemon_menu() {
@@ -116,7 +118,7 @@ do
     case $input in
     w) where_selection_is=$(( $where_selection_is -4 )) ;;
     s) where_selection_is=$(( $where_selection_is +4 )) ;;
-    d) the_swap ; exit ;; # this is where our function for swapping the position of the pokemon in inventory should go
+    d) the_swap ; exit ;;
     a) clear ; exit ;;
     esac
 done

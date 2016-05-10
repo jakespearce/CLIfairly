@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ${HOME}/pokemon/gui/tools.sh
+source ${HOME}/pokemon/gui/tools/tools.sh
 pokedex_files=${HOME}/pokemon/gui/menu_files/pokedex_files
 where_selection_is=1
 menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"

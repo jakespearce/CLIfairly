@@ -1,1 +1,0 @@
-See the howto/pokemon_file_format.notes to see the key for each of the files in this directory.

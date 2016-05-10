@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source ${HOME}/pokemon/gui/menu_files/menus.cfg
-source ${HOME}/pokemon/gui/tools.sh
+source ${HOME}/pokemon/gui/tools/tools.sh
 menu_tools="${HOME}/pokemon/gui/menu_files/menu_tools.sh"
 selection_adjuster=1
 source "$menu_tools"

@@ -7,7 +7,7 @@ source character_files/character.cfg
 source map_files/maps.cfg
 
 # tools file, containing useful functions that may be useful all over the place
-source tools.sh
+source tools/tools.sh
 
 # get correct map and starting coords based on $current_map_char_is_on in character.cfg
 # the value of $current_map_char_is_on points to arrays in maps.cfg to get the right map data

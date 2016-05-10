@@ -181,7 +181,6 @@ done
 unset count
 
 # now write to the file. note - PP is written twice, once for PP_max and once for currentPP.
-# delete after fixing: New additions: 4 extra PP attributes added, representing MaxPP for each move. They are found straight after the currentPP's for each move. levellingRate and catchRate have been tacked onto the end.
 battle_file="${battle_path}${pokemonUniqueID}.${pokemonID}"
 touch "$battle_file"
 zeroValue=0;

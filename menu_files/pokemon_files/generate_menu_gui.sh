@@ -42,6 +42,10 @@ generate_pokemon_menu(){
 	declare -a moveTwoPPARR
 	declare -a moveThreePPARR
 	declare -a moveFourPPARR
+	declare -a moveOnePPMaxARR
+	declare -a moveTwoPPMaxARR
+	declare -a moveThreePPMaxARR
+	declare -a moveFourPPMaxARR
 	declare -a HPARR
 	declare -a attackARR
 	declare -a defenseARR
@@ -54,11 +58,14 @@ generate_pokemon_menu(){
 	declare -a seededARR
 	declare -a substitutedARR
 	declare -a flinchedARR
+	declare -a levellingRateARR
+	declare -a catchRateARR
+	declare -a baseEXPYield
 
 	while [ "$countdown" -lt "$pokemon_count" ]; do
 
 		((countdown++))		
-		while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ HP_ attack_ defence_ special_ speed_ majorAilment_ confusion_ trapped_ chargingUp_ substituted_ flinched_; do
+		while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMAX_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ HP_ attack_ defence_ special_ speed_ majorAilment_ confusion_ trapped_ chargingUp_ substituted_ flinched_ levellingRate_ catchRate_ baseEXPYield_; do
 			pokemonIDARR[$countdown]="$pokemonID_"
 			pokemonUniqueIDARR[$countdown]="$pokemonUniqueID_"
 			pokemonNameARR[$countdown]="$pokemonName_"
@@ -76,6 +83,10 @@ generate_pokemon_menu(){
 			moveTwoPPARR[$countdown]="$moveTwoPP_"
 			moveThreePPARR[$countdown]="$moveThreePP_"
 			moveFourPPARR[$countdown]="$moveFourPP_"
+			moveOnePPMaxARR[$countdown]="$moveOnePPMax_"
+			moveTwoPPMaxARR[$countdown]="$moveTwoPPMax_"
+			moveThreePPMaxARR[$countdown]="$moveThreePPMax_"
+			moveFourPPMaxARR[$countdown]="$moveFourPPMax_"
 			HPARR[$countdown]="$HP_"
 			attackARR[$countdown]="$attack_"
 			defenceARR[$countdown]="$defence_"
@@ -88,6 +99,9 @@ generate_pokemon_menu(){
 			seededARR[$countdown]="$seeded_"
 			substitutedARR[$countdown]="$substituted_"
 			flinchedARR[$countdown]="$flinched_"
+			levellingRateARR[$countdown]="$levellingRate_"
+			catchRateARR[$countdown]="$catchRate_"
+			baseEXPYield[$countdown]="$baseEXPYield"
 		done < "${pokemon_file_location[$countdown]}"
 	IFS=$OLD_IFS
 	done 
@@ -95,6 +109,7 @@ generate_pokemon_menu(){
 	
 	count=1;
 	while [ "$count" -le "$pokemon_count" ]; do
+		# 24 characters are the max characters this function allows for a pokemon's name
 		calculate_whitespace(){
 			whitespace_length=$((25 - ${#pokemonGivenNameARR[$count]}))
 			whitespace="$( head -c "$whitespace_length" < /dev/zero | tr '\0' ' ' )"
@@ -107,8 +122,9 @@ generate_pokemon_menu(){
 			filled_length=$( echo "($filled_fraction * 20)/1" | bc)
 			populated_HPbar="$( head -c "$filled_length" < /dev/zero | tr '\0' '#' )"
 			unfilled_length=$(( 20 - $filled_length ))
-			unpopulated_HPbar="$( head -c "$unfilled_length" < /dev/zero | tr '\0' '-' )"
-
+			# unpopulated_HPbar = 0 breaks things!
+			[[ $unfilled_length -gt 0 ]] && unpopulated_HPbar="$( head -c "$unfilled_length" < /dev/zero | tr '\0' '-' )" || unpopulated_HPbar=;
+			
 		}
 		# eg. hp = 2/20 then HPbar will be "##------------------"
 		draw_HPbar

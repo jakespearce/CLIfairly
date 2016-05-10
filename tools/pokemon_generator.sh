@@ -40,8 +40,8 @@ for i in $attack_IV $defense_IV $special_IV $speed_IV; do
 
 done
 
-# now obtain the base stats, typeOne, typeTwo, pokemonID, and pokemonName
-while read HP_base_ attack_base_ defense_base_ special_base_ speed_base_ typeOne_ typeTwo_ pokemonID_ pokemonName_; do
+# now obtain the base stats, typeOne, typeTwo, pokemonID, pokemonName, levelling rate, catch rate, baseExpYield
+while read HP_base_ attack_base_ defense_base_ special_base_ speed_base_ typeOne_ typeTwo_ pokemonID_ pokemonName_ levellingRate_ catchRate_ baseExpYield_; do
 	HP_base=$HP_base_
 	attack_base=$attack_base_
 	defense_base=$defense_base_
@@ -51,6 +51,9 @@ while read HP_base_ attack_base_ defense_base_ special_base_ speed_base_ typeOne
 	typeTwo=$typeTwo_
 	pokemonID=$pokemonID_
 	pokemonName=$pokemonName_
+	levellingRate=$levellingRate_
+	catchRate=$catchRate_
+	baseExpYield=$baseExpYield_
 done < $base_stat_file
 
 calculate_HP(){
@@ -81,7 +84,7 @@ echo "${defense} - defense"
 echo "${special} - special"
 echo "${speed} - speed"
 
-# extracting the correct moves given the pokemon and its level
+# extracting the correct moves given the pokemon and its level; by default, a pokemon knows the *last four moves* learned, given it's level.
 line_count=;
 while read move_level move_id; do
 
@@ -106,6 +109,7 @@ while read -r move_id; do
 	# commented out because setting the move as the full path to the script is kinda dumb
 	#move_index[$move_count]="${move_script_path}${move_id}"
 	move_index[$move_count]="${move_id}"
+	touch tempPP
 	# while we're here we may as well grab the base PP values for each attack while we're here
 	IFS='	'
 	while read move_id_ move_name_ move_type_ PP_; do
@@ -117,6 +121,14 @@ while read -r move_id; do
 	done < $move_data_path	
 done <<< "$(echo -en "$last_four_moves")"
 IFS=$IFS_old
+
+# if any indexes are empty we replace them with 0 so that our outputted .tab file doesn't break.
+[[ -z "${move_index[1]}" ]] && move_index[1]=0
+[[ -z "${move_index[2]}" ]] && move_index[2]=0
+[[ -z "${move_index[3]}" ]] && move_index[3]=0
+[[ -z "${move_index[4]}" ]] && move_index[4]=0
+
+echo "temp: move four = ${move_index[4]}"
 
 # get pp out of tempPP file (exporting variables from nested while loops is long)
 PP_count=;
@@ -153,49 +165,14 @@ while [ $count -le $move_count ]; do
 done
 unset count
 
-# now write to the file
+# now write to the file. note - PP is written twice, once for PP_max and once for currentPP.
+# delete after fixing: New additions: 4 extra PP attributes added, representing MaxPP for each move. They are found straight after the currentPP's for each move. levellingRate and catchRate have been tacked onto the end.
 battle_file="${battle_path}${pokemonUniqueID}.${pokemonID}"
 touch "$battle_file"
 zeroValue=0;
-for value in $pokemonID $pokemonUniqueID $pokemonName $pokemonName $zeroValue $HP $level $typeOne $typeTwo ${move_index[1]} ${move_index[2]} ${move_index[3]} ${move_index[4]} $PP_1 $PP_2 $PP_3 $PP_4 $HP $attack $defense $special $speed $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue; do
+for value in $pokemonID $pokemonUniqueID $pokemonName $pokemonName $zeroValue $HP $level $typeOne $typeTwo ${move_index[1]} ${move_index[2]} ${move_index[3]} ${move_index[4]} $PP_1 $PP_2 $PP_3 $PP_4 $PP_1 $PP_2 $PP_3 $PP_4 $HP $attack $defense $special $speed $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $levellingRate $catchRate $baseExpYield; do
 # the space after $value is a tab.
 echo -n "$value	" >> $battle_file
 done
 echo "" >> $battle_file
 
-# $battle file key:
-#0pokemonID
-#1pokemonUniqueID
-#2pokemonName
-#3pokemonGivenName (same as 2. for a wild or trainer owned pokemon.)
-#4inventoryStatus (possibly not relevant if we store the active pokemon as a variable)
-#5currentHP
-#6level
-#8typeOne
-#9typeTwo
-#10moveOne
-#11moveTwo
-#12moveThree
-#13moveFour
-#14moveOnePP
-#15moveTwoPP
-#16moveThreePP
-#17moveFourPP
-#18HP
-#19attack
-#20defense
-#21special
-#22speed
-#23majorAilment - 0 = none, 1=BRN,2=FRZ,4=PAR,5=POISONED,6=BADLYPOISONED,7=SLEEP
-#24confusion
-#25trapped
-#26charging up (can be used for flying, dig, hyper beam, flinching (maybe))
-#27seeded
-#28substituted
-#29flinched(?)
-#----below: possibly not needed here (they're not included here as of NOW). we can append these when a pokemon is captured. -----#
-#35HPEV
-#36attackEV
-#37defenseEV
-#38specialEV
-#39speedEV

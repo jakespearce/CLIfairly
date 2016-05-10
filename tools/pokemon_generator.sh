@@ -84,6 +84,23 @@ echo "${defense} - defense"
 echo "${special} - special"
 echo "${speed} - speed"
 
+# calculate the pokemon's current Exp. When a pokemon is seen for the first time, the Exp is exactly what it needs to be the level that it is.
+# scale=3 uses 3 digits past the decimal place IN THE CALCULATION, NOT JUST THE ANSWER.
+# F = fast MF = medium fast MS = medium slow S = slow
+nextLevel=$(( $level + 1 ))
+case "$levellingRate" in
+	F) currentExp=$( echo "scale=3;(4/5) * (($level)^3)" | bc ) ; nextLevelExp=$( echo "scale=3;(4/5) * (($nextLevel)^3)" | bc ) ;;
+	MF) currentExp=$( echo "scale=3;($level)^3" | bc  ) ; nextLevelExp=$( echo "scale=3;($nextLevel)^3" | bc  ) ;;
+	MS) currentExp=$( echo "scale=3;((6/5) * (($level)^3)) - 15 * (($level)^2) + (100 * $level) - 140" | bc  ) ; nextLevelExp=$( echo "scale=3;((6/5) * (($nextLevel)^3)) - 15 * (($nextLevel)^2) + (100 * $nextLevel) - 140" | bc  ) ;;
+	S) currentExp=$( echo "scale=3;(5/4) * (($level)^3)" | bc  ) ; nextLevelExp=$( echo "scale=3;(5/4) * (($nextLevel)^3)" | bc  ) ;;
+esac
+# round the number to the nearest integer
+currentExp=$( echo "$currentExp / 1" | bc )
+nextLevelExp=$( echo "$nextLevelExp / 1" | bc )
+
+
+echo "The pokemon gains Exp at a ${levellingRate}. At level ${level} its currentExp is ${currentExp}. The pokemon needs to reach ${nextLevelExp} to get to level ${nextLevel}."
+
 # extracting the correct moves given the pokemon and its level; by default, a pokemon knows the *last four moves* learned, given it's level.
 line_count=;
 while read move_level move_id; do
@@ -128,8 +145,6 @@ IFS=$IFS_old
 [[ -z "${move_index[3]}" ]] && move_index[3]=0
 [[ -z "${move_index[4]}" ]] && move_index[4]=0
 
-echo "temp: move four = ${move_index[4]}"
-
 # get pp out of tempPP file (exporting variables from nested while loops is long)
 PP_count=;
 tempPP="${HOME}/pokemon/gui/tools/tempPP"
@@ -170,7 +185,7 @@ unset count
 battle_file="${battle_path}${pokemonUniqueID}.${pokemonID}"
 touch "$battle_file"
 zeroValue=0;
-for value in $pokemonID $pokemonUniqueID $pokemonName $pokemonName $zeroValue $HP $level $typeOne $typeTwo ${move_index[1]} ${move_index[2]} ${move_index[3]} ${move_index[4]} $PP_1 $PP_2 $PP_3 $PP_4 $PP_1 $PP_2 $PP_3 $PP_4 $HP $attack $defense $special $speed $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $levellingRate $catchRate $baseExpYield; do
+for value in $pokemonID $pokemonUniqueID $pokemonName $pokemonName $zeroValue $HP $level $typeOne $typeTwo ${move_index[1]} ${move_index[2]} ${move_index[3]} ${move_index[4]} $PP_1 $PP_2 $PP_3 $PP_4 $PP_1 $PP_2 $PP_3 $PP_4 $HP $attack $defense $special $speed $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $zeroValue $levellingRate $catchRate $baseExpYield $currentExp $nextLevelExp; do
 # the space after $value is a tab.
 echo -n "$value	" >> $battle_file
 done

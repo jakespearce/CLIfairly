@@ -18,6 +18,9 @@
 #    $currentHP / $maxHP
 # STATUS / $mainAilment
 #
+
+
+
 #blockTwo (stat screen one)
 #
 # $pokemonID

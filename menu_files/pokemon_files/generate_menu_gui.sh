@@ -60,12 +60,14 @@ generate_pokemon_menu(){
 	declare -a flinchedARR
 	declare -a levellingRateARR
 	declare -a catchRateARR
-	declare -a baseEXPYield
+	declare -a baseExpYieldARR
+	declare -a currentExpARR
+	declare -a nextLevelExpARR
 
 	while [ "$countdown" -lt "$pokemon_count" ]; do
 
 		((countdown++))		
-		while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMAX_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ HP_ attack_ defence_ special_ speed_ majorAilment_ confusion_ trapped_ chargingUp_ substituted_ flinched_ levellingRate_ catchRate_ baseEXPYield_; do
+		while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMAX_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ HP_ attack_ defence_ special_ speed_ majorAilment_ confusion_ trapped_ chargingUp_ substituted_ flinched_ levellingRate_ catchRate_ baseExpYield_ currentExp_ nextLevelExp_; do
 			pokemonIDARR[$countdown]="$pokemonID_"
 			pokemonUniqueIDARR[$countdown]="$pokemonUniqueID_"
 			pokemonNameARR[$countdown]="$pokemonName_"
@@ -101,7 +103,9 @@ generate_pokemon_menu(){
 			flinchedARR[$countdown]="$flinched_"
 			levellingRateARR[$countdown]="$levellingRate_"
 			catchRateARR[$countdown]="$catchRate_"
-			baseEXPYield[$countdown]="$baseEXPYield"
+			baseExpYieldARR[$countdown]="$baseExpYield_"
+			currentExpARR[$countdown]="$currentExp_"
+			nextLevelExpARR[$countdown]="$nextLevelExp_"
 		done < "${pokemon_file_location[$countdown]}"
 	IFS=$OLD_IFS
 	done 

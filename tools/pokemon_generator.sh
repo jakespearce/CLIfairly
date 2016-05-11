@@ -103,13 +103,18 @@ nextLevelExp=$( echo "$nextLevelExp / 1" | bc )
 echo "The pokemon gains Exp at a ${levellingRate}. At level ${level} its currentExp is ${currentExp}. The pokemon needs to reach ${nextLevelExp} to get to level ${nextLevel}."
 
 # extracting the correct moves given the pokemon and its level; by default, a pokemon knows the *last four moves* learned, given it's level.
-line_count=;
+line_count=0
+move_fileHeight=$( wc -l < "$move_file" )
 while read move_level move_id; do
 
     ((line_count++))
     if [ "$move_level" -gt "$level"  ]; then
         highestMove_line=$(($line_count - 1))
-        break    
+        break
+	# if the generated pokemon's level is higher than the level at which it learns it's last move...
+	elif [ "$line_count" -eq "$move_fileHeight" -a "$level" -ge "$move_level" ]; then
+		highestMove_line="$move_fileHeight"
+		break
     fi  
 done < $move_file
 unset line_count

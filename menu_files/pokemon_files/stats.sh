@@ -23,7 +23,8 @@ whitespace_character=" "
 [[ -e "$blockFour" ]] && rm "$blockFour"
 [[ -e "$blockFive" ]] && rm "$blockFive"
 
-# get the ID and moves of the pokemon that is currently selected in the pokemon menu:
+# leaving the commented out variables there just in case we need to use them in the future
+# get the ID of the pokemon that is currently selected in the pokemon menu:
 count=0
 IFS_OLD=$IFS
 # space

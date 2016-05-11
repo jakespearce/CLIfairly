@@ -13,7 +13,7 @@ change_conf_value(){
 }
 
 
-# $whitespace_max is the total length of a string. given $string_length we output $whitespace which we append to the string in order to reach the value of whitespace max. Oh, and the whitespace doesn't HAVE to be whitespace.
+# $whitespace_max is the total characters from where our string starts and where we want our potentially added whitespace to end.. given $string_length we append 'whitespace' characters to the string until our string length + our whitespace = whitespace max. Oh, and the whitespace doesn't HAVE to be whitespace.
 calculate_whitespace(){
 
     whitespace_max=$1

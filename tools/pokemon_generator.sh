@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # this file literally just generates pokemon for when they're seen for the first time.
+# TODO when this goes live, change the battle path back to /pokemon/gui/battles/enemy (or somwhere else)
 
 base_stat_file=$1 # /pokemon/gui/pokemon_database/base_stats/somethingsomething.bulbasaur
 move_file=$2 # /pokemon/gui/pokemon_database/move_list/001.movesBULBASAUR
@@ -9,7 +10,7 @@ level=$3
 move_script_path="${HOME}/pokemon/gui/pokemon_database/common/moves/move_scripts/"
 move_data_path="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.tab"
 ID_counter_path="${HOME}/pokemon/gui/pokemon_database/common/ID_counter"
-battle_path="${HOME}/pokemon/gui/battles/enemy/"
+battle_path="${HOME}/pokemon/gui/character_files/owned_pokemon/"
 
 # Give the pokemon a unique id
 while read id_value; do

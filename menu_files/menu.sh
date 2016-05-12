@@ -63,6 +63,7 @@ select_menu_item(){
 
 			[[ $item_number == 1 ]] && bash ${menu_files}/pokedex_files/pokedex.sh
 			[[ $item_number == 2 ]] && bash ${menu_files}/pokemon_files/interact_pokemon_menu.sh
+			[[ $item_number == 3 ]] && bash ${menu_files}/item_files/interact_item_menu.sh
 			# TODO: THE REST
     	fi
   	done < $current_menu

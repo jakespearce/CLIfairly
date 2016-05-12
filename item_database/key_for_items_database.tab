@@ -1,0 +1,15 @@
+ID	Item Name	Context	Price	Submenu
+
+Price: Player to vendor sale price is always 1/2 this value.
+
+Submenu: Determines whether the item brings up a submenu FOR OUTSIDE OF BATTLE ONLY. eg. Bike doesn't bring up a submenu, you either get on the bike instantly when it's selected, or an error appears 'This is not the time to use this!'
+
+Context: A series of numbers denoting what contexts the item can be used in. 
+0 = Never (eg. Nugget, Key Items such as Dome and Helix Fossils)
+1 = Any time, Anywhere (eg. Potion) [supersedes any other value]
+2 = In battle (eg. Pokeball) 
+3 = Outside, incl. caves (eg. Bike)
+4 = Caves only (eg. Escape Rope)
+5 = Water edge, or maybe in water (eg. Fishing Rod)
+MORE TO COME
+

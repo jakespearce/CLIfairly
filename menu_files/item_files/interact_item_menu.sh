@@ -11,7 +11,10 @@ where_selection_is_file_item_menu="${HOME}/pokemon/gui/menu_files/item_files/whe
 item_menu_file="${HOME}/pokemon/gui/menu_files/item_files/inventory_items.tab"
 menu_height=$( wc -l < "$item_menu_file"  )
 selection_adjuster=1 # used for keeping selection in range
+B=1 # B = Before, F = in front. We see 7 menu items at a time. When we open the menu we see all items between 1 and 7.
+F=7
 
+# i don't think this is needed.
 display_inventory_items
 
 while :
@@ -23,7 +26,7 @@ do
 	case $input in
 	w) where_selection_is=$(( $where_selection_is - 1)) ;;
 	s) where_selection_is=$(( $where_selection_is + 1)) ;;
-	d) echo "$where_selection_is" > "$where_selection_is_file_item_menu" ; bash "$item_submenu_script" ;;
+	d) echo "$where_selection_is" > "$where_selection_is_file_item_menu" ; bash "$item_submenu_script" "$B" "$F" ;;
 	a) clear ; exit ;;
 	esac
 done

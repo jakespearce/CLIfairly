@@ -8,6 +8,8 @@ item_submenu_file="${HOME}/pokemon/gui/menu_files/item_files/item_submenu"
 menu_height=$( wc -l < "$item_submenu_file"  )
 selection_adjuster=1 # used for keeping selection in range
 where_selection_is=1 # used exclusively for deciding where we are on the item submenu
+B=$1 # B and F are used in item_tools.sh, specifically display_inventory_items when it calls
+F=$2
 
 #get_where_selection_is_item_menu # we want to display the item menu with the correct selection highlighted
 #display_inventory_items

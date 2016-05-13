@@ -14,10 +14,25 @@ get_where_selection_is_item_menu(){
 	done < "$where_selection_is_file_item_menu"
 }
 
+reposition_item_menu_window(){
+
+
+    if [ "$inventory_item_selection" -lt "$B" -a "$B" -ne 1 ]; then
+        B=$(( $B - 1 ))
+        F=$(( $F - 1 ))
+    
+	# menu height needs to be sourced from the correct place.
+    elif [ "$inventory_item_selection" -gt "$F" -a "$F" -ne "$menu_height" ]; then 
+        B=$(( $B + 1  ))
+        F=$(( $F + 1 ))
+    fi 
+}
+
 
 display_inventory_items(){
 
 	inventory_item_selection=$1
+	reposition_item_menu_window
 	local count=0
 	OLD_IFS=$IFS
 	IFS="	" # tab
@@ -29,11 +44,12 @@ display_inventory_items(){
 		itemContext="$itemContext_"
 		subMenu="$subMenu_"
 
-
-		if [ "$count" -eq "$inventory_item_selection" ]; then
-			echo $hiOn "$itemName" $hiOff
-		else
-			echo "$itemName"
+		if [ "$count" -ge "$B" -a "$count" -le "$F" ]; then
+			if [ "$count" -eq "$inventory_item_selection" ]; then
+				echo $hiOn "$itemName" $hiOff
+			else
+				echo "$itemName"
+			fi
 		fi
 
 	done < "$inventory_items_path"

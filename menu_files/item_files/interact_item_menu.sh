@@ -14,9 +14,6 @@ selection_adjuster=1 # used for keeping selection in range
 B=1 # B = Before, F = in front. We see 7 menu items at a time. When we open the menu we see all items between 1 and 7.
 F=7
 
-# i don't think this is needed.
-display_inventory_items
-
 while :
 do
 	clear

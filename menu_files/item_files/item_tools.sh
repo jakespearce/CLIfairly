@@ -5,6 +5,7 @@ item_submenu_file="${HOME}/pokemon/gui/menu_files/item_files/item_submenu"
 hiOn=$( tput smso )
 hiOff=$( tput rmso )
 where_selection_is_file_item_menu="${HOME}/pokemon/gui/menu_files/item_files/where_selection_is_items"
+where_selection_is_file_item_submenu="${HOME}/pokemon/gui/menu_files/item_files/where_selection_is_item_submenu"
 
 
 get_where_selection_is_item_menu(){
@@ -13,6 +14,15 @@ get_where_selection_is_item_menu(){
 		where_selection_is_item_menu="$value"
 	done < "$where_selection_is_file_item_menu"
 }
+
+
+get_where_selection_is_item_submenu(){
+
+	while read value; do
+		where_selection_is_item_submenu="$value"
+	done < "$where_selection_is_file_item_submenu"
+}
+
 
 reposition_item_menu_window(){
 
@@ -32,7 +42,8 @@ reposition_item_menu_window(){
 display_inventory_items(){
 
 	inventory_item_selection=$1
-	reposition_item_menu_window
+	reposition_item_menu_window	# I think we need to provide the values of B and F here for when this function is called from anywhere else but item menu and item submenu, Why does it only work in them circumstances?
+
 	local count=0
 	OLD_IFS=$IFS
 	IFS="	" # tab
@@ -61,13 +72,14 @@ display_inventory_items(){
 # when we use an item on a pokemon, we're taken back to the main pokemon menu and we find ourselves at the top of the menu. worth bearing in mind.
 display_submenu(){
 
+	submenu_item_selection=$1 # TODO newly added for toss
 	local count=0
 	while read subMenuOption_; do
 		((count++))
 		subMenuOption="$subMenuOption_"
 
 		# $where_selection_is_submenu is set in the interact_item_submenu.sh script
-		if [ "$where_selection_is" -eq "$count" ]; then
+		if [ "$submenu_item_selection" -eq "$count" ]; then
 			echo $hiOn "$subMenuOption" $hiOff
 		else
 			echo "$subMenuOption"
@@ -79,17 +91,18 @@ display_submenu(){
 # what's count doing in this function?
 get_item_data(){
 
+	target_item=$1 # this is a number representing how many lines down the inventory_items.tab the target item is
 	local count=0
 	OLD_IFS=$IFS
 	IFS="	" # tab
-	while read itemID_ itemName_ itemContext_ itemQuantity_ subMenu_; do		
+	while read itemID_ itemName_ itemContext_ itemQuantity_ subMenu_; do
 		((count++))
 		itemName="$itemName_"
 		itemID="$itemID_"
 		itemQuantity="$itemQuantity_"
 		itemContext="$itemContext_"
 		subMenu="$subMenu_"
-
+		[[ $count == $target_item ]] && break
 	done < "$inventory_items_path"
 
 }

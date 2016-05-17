@@ -23,6 +23,7 @@ do
 	case $input in
 	w) where_selection_is=$(( $where_selection_is - 1)) ;;
 	s) where_selection_is=$(( $where_selection_is + 1)) ;;
+	# we need where_selection_is in file form so we can read it in item_tools.sh
 	d) echo "$where_selection_is" > "$where_selection_is_file_item_menu" ; bash "$item_submenu_script" "$B" "$F" ;;
 	a) clear ; exit ;;
 	esac

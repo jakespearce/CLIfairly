@@ -28,6 +28,7 @@ do
 	# to prevent conflicts with multiple scripts using the $where_selection_is variable, we provide display_inventory_items with an argument of what the last selection for the parent item menu when we called this script.
 	display_inventory_items "$where_selection_is_item_menu"
 	keep_selection_in_range "$where_selection_is" "$selection_adjuster"
+	# here is where we should have a script or function that verifies whether the item brings up a submenu or not.
 	display_submenu "$where_selection_is" # this is dodgey, this variable is used everywhere
 	read -n1 input < /dev/tty
 	case $input in

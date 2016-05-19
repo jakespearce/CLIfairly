@@ -17,6 +17,7 @@ F=7
 while :
 do
 	clear
+	menu_height=$( wc -l < "$item_menu_file"  ) # for when we TOSS an item we need to work out menu height again.
 	keep_selection_in_range "$where_selection_is" "$selection_adjuster"
 	display_inventory_items "$where_selection_is"
 	read -n1 input < /dev/tty
@@ -24,6 +25,7 @@ do
 	w) where_selection_is=$(( $where_selection_is - 1)) ;;
 	s) where_selection_is=$(( $where_selection_is + 1)) ;;
 	# we need where_selection_is in file form so we can read it in item_tools.sh
+	# TODO submenu shouldn't open for certain items eg. Bicycle. Should this functionality be here or in the submenu script?
 	d) echo "$where_selection_is" > "$where_selection_is_file_item_menu" ; bash "$item_submenu_script" "$B" "$F" ;;
 	a) clear ; exit ;;
 	esac

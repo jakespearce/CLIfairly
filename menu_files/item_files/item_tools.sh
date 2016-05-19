@@ -55,11 +55,18 @@ display_inventory_items(){
 		itemContext="$itemContext_"
 		subMenu="$subMenu_"
 
+		# calculating whitespace is resource-intensive and makes the display flicker :( might have to get smarter with this.
+		inventory_whitespace_max=17 # based off the length of 99 Thunder Stones (longest item name and qt. in game)
+		item_name_length=${#itemName}
+		item_quantity_length=$(( ${#itemQuantity} + 1 )) # + 1 for the x, eg. x99
+		inventory_whitespace_length=$(( $inventory_whitespace_max - $item_name_length - $item_quantity_length ))
+		inventory_whitespace="$( head -c "$inventory_whitespace_length" < /dev/zero | tr '\0' ' ' )"
+
 		if [ "$count" -ge "$B" -a "$count" -le "$F" ]; then
 			if [ "$count" -eq "$inventory_item_selection" ]; then
-				echo $hiOn "$itemName" $hiOff
+				echo $hiOn "${itemName}${inventory_whitespace}x${itemQuantity}" $hiOff
 			else
-				echo "$itemName"
+				echo "${itemName}${inventory_whitespace}x${itemQuantity}"
 			fi
 		fi
 

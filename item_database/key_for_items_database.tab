@@ -1,8 +1,10 @@
-ID	Item Name	Context	Price	Submenu
+ID	Item Name	Context	Price	Submenu	KeyItem
 
 Price: Player to vendor sale price is always 1/2 this value.
 
 Submenu: Determines whether the item brings up a submenu FOR OUTSIDE OF BATTLE ONLY. eg. Bike doesn't bring up a submenu, you either get on the bike instantly when it's selected, or an error appears 'This is not the time to use this!'
+
+KeyItem: If this field is populated with a 1 then the item is a key item.
 
 Context: A series of numbers denoting what contexts the item can be used in. 
 0 = Never (eg. Nugget, Key Items such as Dome and Helix Fossils)

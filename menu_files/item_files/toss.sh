@@ -12,6 +12,20 @@ menu_height=1 #TODO this is just a placeholder so that reposition_item_menu_wind
 tossQuantity=1
 
 
+retain_key_item(){
+
+	if [ "$keyItem" -eq 1 ]; then
+		echo "O-------------------------------O"
+		echo "| That's too important to toss! |"
+		echo "O-------------------------------O"
+
+		read -n1 input < /dev/tty
+
+		exit 0
+	fi
+}
+
+
 # this function ensures that we 'loop' through the quantity to toss
 adjust_toss_quantity(){
 
@@ -67,8 +81,9 @@ do
 	get_where_selection_is_item_submenu
 	display_inventory_items "$where_selection_is_item_menu"
 	display_submenu "$where_selection_is_item_submenu"
-	display_toss_quantity
 	get_item_data "$where_selection_is_item_menu" # get data about the item we have selected.
+	retain_key_item
+	display_toss_quantity
 	read -n1 input < /dev/tty
 	case $input in
 	w) tossQuantity=$(( $tossQuantity + 1 )) ; adjust_toss_quantity ;;

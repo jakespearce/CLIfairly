@@ -47,26 +47,37 @@ display_inventory_items(){
 	local count=0
 	OLD_IFS=$IFS
 	IFS="	" # tab
-	while read itemID_ itemName_ itemContext_ itemQuantity_ subMenu_; do
+	while read itemID_ itemName_ itemContext_ itemQuantity_ subMenu_ keyItem_; do
 		((count++))
 		itemName="$itemName_"
 		itemID="$itemID_"
 		itemQuantity="$itemQuantity_"
 		itemContext="$itemContext_"
 		subMenu="$subMenu_"
+		keyItem="$keyItem_"
 
 		# calculating whitespace is resource-intensive and makes the display flicker :( might have to get smarter with this.
 		inventory_whitespace_max=17 # based off the length of 99 Thunder Stones (longest item name and qt. in game)
 		item_name_length=${#itemName}
 		item_quantity_length=$(( ${#itemQuantity} + 1 )) # + 1 for the x, eg. x99
+		[[ $keyItem = 1 ]] && item_quantity_length=0
 		inventory_whitespace_length=$(( $inventory_whitespace_max - $item_name_length - $item_quantity_length ))
 		inventory_whitespace="$( head -c "$inventory_whitespace_length" < /dev/zero | tr '\0' ' ' )"
 
 		if [ "$count" -ge "$B" -a "$count" -le "$F" ]; then
 			if [ "$count" -eq "$inventory_item_selection" ]; then
-				echo $hiOn "${itemName}${inventory_whitespace}x${itemQuantity}" $hiOff
+
+				case $keyItem in
+					0) echo $hiOn "${itemName}${inventory_whitespace}x${itemQuantity}" $hiOff ;;
+					1) echo $hiOn "${itemName}${inventory_whitespace}" $hiOff ;; # don't display qty for key items
+				esac
 			else
-				echo "${itemName}${inventory_whitespace}x${itemQuantity}"
+
+				case $keyItem in
+					0) echo "${itemName}${inventory_whitespace}x${itemQuantity}" ;;
+					1) echo "${itemName}${inventory_whitespace}" ;; # don't display qty for key items
+				esac
+
 			fi
 		fi
 
@@ -102,13 +113,14 @@ get_item_data(){
 	local count=0
 	OLD_IFS=$IFS
 	IFS="	" # tab
-	while read itemID_ itemName_ itemContext_ itemQuantity_ subMenu_; do
+	while read itemID_ itemName_ itemContext_ itemQuantity_ subMenu_ keyItem_; do
 		((count++))
 		itemName="$itemName_"
 		itemID="$itemID_"
 		itemQuantity="$itemQuantity_"
 		itemContext="$itemContext_"
 		subMenu="$subMenu_"
+		keyItem="$keyItem_"
 		[[ $count == $target_item ]] && break
 	done < "$inventory_items_path"
 

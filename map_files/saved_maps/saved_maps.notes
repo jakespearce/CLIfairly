@@ -1,0 +1,3 @@
+This is where maps that have been visited (and usually changed in some way) by the player are stored in the long-term.
+TODO: On game start, write all maps that have been saved here to /dev/shm. In gameplay, only read maps from /dev/shm.
+Upon leaving a map, write the map from /dev/shm to saved_maps/ (here)

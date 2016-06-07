@@ -1,0 +1,47 @@
+yline_that_x_is_on = target_yLine
+xchar_newline_count = x_charNewLine
+
+
+
+
+Map Parsing
+
+First method:
+- The first method is the thing we have implemented now
+- Each map has a script file that determines where events happen.
+- Events can be not being able to pass through a wall, or some other script being called.
+
+Improvements on first method:
+- A lot of the functions in the gui_and_input.sh file could be moved elsewhere. We could have a script or function that literally just parses the maps and takes arguments. See below.
+- The map parsing should be a seperate function that takes arguments. This way, can we move things across the map independently of the player?
+- When we get in 'eye' range of a trainer the player can't move. We could run a seperate script that renders the map again, but moving a particular NPC towards the player.
+- Code work would require removing some of the player specific lines/functions.
+- Maps should be able to change, we achieve this by keeping a copy of the map the player has 'edited', where edited could be an NPC moving across the map, or a tree being removed by 'cut'.
+ - We only draw maps a certain size, and leaving the boundary of that map brings you into a new map.
+Eg. for a cave like Mt. Moon, you can only see eg. 40x40 parts of the map at a time. We'd have Mt.Moon map 1, Mt.Moon map 2 etc.
+
+
+Things to keep:
+The map_function_conditions seems to work quite well. Changing the value of an array to change the map is good.
+
+Things to think about:
+- Items that require us to be in a particular place on the map. Eg. Using Cut on a tree or Surf on a body of water.
+- When the item is used, the map is read and a context is created and saved to the global config file.
+- Entering some maps simply changes the global config file, eg. Entering a cave sets it to 4(?)
+- We need to be able to control progression and story, eg. delivering a parcel to prof. oak. 
+- Perhaps we need a global progression file. Each line can be populated with a number depending on whether that 'progression' has been met. Eg. delivering the parcel to oak beings at 0. We enter the pokemart and we're given the parcel. It increases to '1' for 'in-progress'. Once the quest is complete the value changes to 2. Depending on this progression value, we may get different behaviour when we try and interact with things on maps,
+eg. If the oak delivery quest is half way through, speaking to your mother may prompt her to say 'Oak needs that parcel!'.
+
+
+
+Battles and the Global config file:
+- A battle is just a script that is run over the top of the map bash script.
+- When we go into battle, the global config file is instantly changed.
+
+Second method:
+- Two map files, one a gui and one a 'back-end'.
+- When we move on the map, we just read the backend.
+- We're still going to have to test what backend character the player is on. Then we'll have to run scripts.
+
+
+

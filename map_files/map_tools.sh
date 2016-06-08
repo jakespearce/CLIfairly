@@ -8,8 +8,6 @@ get_map_info(){
     map="${maps[$current_map_char_is_on]}"
     x="${starting_x_coords[$current_map_char_is_on]}"
     y="${starting_y_coords[$current_map_char_is_on]}"
-	# dubious usefulness
-    background_art="${background_art_selection[$current_map_char_is_on]}"
     map_height=$( wc -l < $map )
     chars_on_map=$( wc -c < $map )
     # -1 so we ignore the newline character

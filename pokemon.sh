@@ -18,9 +18,10 @@ input_prompt(){
         a) left ;;
         d) right ;;
         # interaction is a function found whatever the current_map_functions file is set to
-        e) clear ; cat /home/senpai/pokemon/gui/map_files/output_tests/marked_map_output ; echo "" ; echo -n " " ; interaction ;;
-        m) bash ${HOME}/pokemon/gui/menu_files/menu.sh ; cat /home/senpai/pokemon/gui/map_files/output_tests/marked_map_output;;
-        *) echo "fuck off" ;;
+		# map_rw_path needs to be located in /dev/shm in the future
+        e) clear ; cat "${map_rw_path}/marked_map_output" ; echo "" ; echo -n " " ; interaction ;;
+        m) bash ${HOME}/pokemon/gui/menu_files/menu.sh ; cat "${map_rw_path}/marked_map_output" ;;
+        *) echo "WASD to move, e to interact with things, m for menu." ;;
     esac
 }
 

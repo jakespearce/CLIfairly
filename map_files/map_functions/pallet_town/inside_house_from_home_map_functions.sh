@@ -14,7 +14,7 @@ map_function_conditions(){
   	if [ "$current_map_char_is_on" -eq 2 -a "$y_element" -eq 5 ]; then
     	if [ "$x_element" -eq 6 -o "$x_element" -eq 7 ]; then
       		change_conf_value "character_files/character.cfg" "current_map_char_is_on" 1
-      		get_new_map_info_set_start_pos 7 10
+      		get_new_map_info_set_start_pos 9 10
     	fi
   	fi
 }

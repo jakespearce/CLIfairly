@@ -14,7 +14,24 @@ get_map_info(){
     map_width=$(( $(( $chars_on_map / $map_height )) - 1 ))
     # depending on what map the character is on, we load a different set of map functions. see map_function_conditions function
     current_map_functions="${map_functions[$current_map_char_is_on]}"
+	current_map_quests="${map_quests[$current_map_char_is_on]}"
     source "$current_map_functions"
+	source "$current_map_quests"
+}
+
+
+display_map(){
+
+    cat "${map_rw_path}/marked_map_output"
+}
+
+# For Pallet Town this will overwrite the map 'pallet_town' in map_files/maps/pallet_town/
+mark_source_map(){
+	mapToWriteOver=$1
+	mapToWrite="${map_rw_path}/marked_map_output"
+
+	cp "$mapToWrite" "$mapToWriteOver"
+
 }
 
 
@@ -66,7 +83,7 @@ change_map_element(){
 	local IFS=$IFS_OLD
 	echo ""
 	clear
-	cat "${map_rw_path}/marked_map_output"
+#	cat "${map_rw_path}/marked_map_output" NOTE: removed and added to map_tools.sh as display_map
 
 }
 
@@ -94,7 +111,8 @@ up(){
 	inspect_element $x $y
  
 	if [ $canWeMove == "yes" ]; then
-		change_map_element $x $y $playerCharacter $map $map_width
+		change_map_element $x $y $playerCharacter $map $map_width ; display_map
+
 	else
 		y=$(( $y + 1 ))
 	fi
@@ -106,7 +124,8 @@ down(){
 	inspect_element $x $y
   
 	if [ $canWeMove == "yes" ]; then
-		change_map_element $x $y $playerCharacter $map $map_width
+		change_map_element $x $y $playerCharacter $map $map_width ; display_map
+
 	else
 		y=$(( $y - 1 ))
 	fi
@@ -118,7 +137,8 @@ left(){
 	inspect_element $x $y
    
 	if [ $canWeMove == "yes" ]; then
-		change_map_element $x $y $playerCharacter $map $map_width
+		change_map_element $x $y $playerCharacter $map $map_width ; display_map
+
 	else
 		 x=$(( $x + 1 ))
 	fi
@@ -130,7 +150,8 @@ right(){
 	inspect_element $x $y
  
 	if [ $canWeMove == "yes" ]; then
-		change_map_element $x $y $playerCharacter $map $map_width
+		change_map_element $x $y $playerCharacter $map $map_width ; display_map
+
 	else
 		 x=$(( $x - 1 ))
 	fi

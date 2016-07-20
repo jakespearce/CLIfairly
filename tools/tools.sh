@@ -36,7 +36,19 @@ draw_HPbar(){
     
 }
 
+get_quest_progress_value(){
 
+	# target_quest is represented by the line number the quest sits on in character_progress.tab
+	# Will always be an even number. Odd lines provide a comment on the quest.
+	target_quest=$1
+	local count=0;
+	while read quest_status_; do
+		((count++))
+		if [ "$count" -eq "$target_quest" ]; then
+			quest_status="$quest_status_"
+		fi
+	done < "${HOME}/pokemon/gui/character_files/character_progress.tab"
+}
 
 # reads a pokemon file and extracts values to variables.
 

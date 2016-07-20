@@ -1,0 +1,9 @@
+How does the questing system work?
+
+1) There's a character_progress.tab file in the character_files directory.
+This stores all of the character's progress WRT different quests.
+2) There must be an entry for a map's map_quest[] files in maps.cfg
+3) The map_quest array element must point to a quest functions script in the map's respective map_functions directory.
+4) map_tools.sh sources the quest functions appropriate for the map the character is on
+5) each map's map_function conditions (found in the map's respective map_functions script) is responsible for marking the areas, or triggers, on the map that cause the function in the map's quest script to run.
+eg. if character is in pallet town and is standing on element (4,8) then the pallet_town_functions.sh calls the character_falls_down_hole function which was sourced from the pallet_town_quests.sh script.

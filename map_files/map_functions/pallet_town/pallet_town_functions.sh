@@ -80,7 +80,8 @@ interaction(){
 
 	# signpost thing
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 4 -a "$x_element" -le 6 ]; then
-		echo "Sign post: \"Gary's house\""
+#		echo "Sign post: \"Gary's house\"" TEMPORARILY CHANGED FOR TESTING
+		move_map_element 24 10 21 10 L T "$map"
 	fi
 
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 23 -a "$x_element" -le 25 ]; then

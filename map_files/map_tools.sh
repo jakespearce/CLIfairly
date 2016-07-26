@@ -25,13 +25,13 @@ display_map(){
     cat "${map_rw_path}/marked_map_output"
 }
 
+
 # For Pallet Town this will overwrite the map 'pallet_town' in map_files/maps/pallet_town/
 mark_source_map(){
+
 	mapToWriteOver=$1
 	mapToWrite="${map_rw_path}/marked_map_output"
-
 	cp "$mapToWrite" "$mapToWriteOver"
-
 }
 
 
@@ -156,6 +156,59 @@ right(){
 		 x=$(( $x - 1 ))
 	fi
 }
+
+
+# TODO
+# Our character disappears from the map when we're moving other characters
+# Write something that identifies the previous tile that the moving character was on.
+# This will be $replacementCharacter
+
+move_map_element(){
+
+	xInitial=$1
+	yInitial=$2
+	xFinal=$3
+	yFinal=$4
+	characterToMove=$5
+	replacementCharacter=$6
+	map=$7
+
+
+	xDiff=$(( $xFinal - $xInitial )) 
+	yDiff=$(( $yFinal - $yInitial )) 
+	if [ $xDiff -ne 0 ]; then
+		[[ $xDiff -lt 0 ]] && xMod=-1 || xMod=1 ; yMod=0 ; absDiff=$( echo "sqrt(${xDiff}^2)" | bc )
+	else
+		[[ $yDiff -lt 0 ]] && yMod=-1 || yMod=1; xMod=0 ; absDiff=$( echo "sqrt($yxDiff}^2)" | bc )
+	fi
+
+	loopsCompleted=0
+	leadingXValue=$(( $xInitial + $xMod ))
+	trailingXValue=$xInitial	
+	leadingYValue=$(( $yInitial - $yMod ))
+	trailingYValue=$yInitial
+
+	until [ $loopsCompleted -eq $absDiff ]; do
+
+		# this function call changes the map for the 'leading' character
+		change_map_element $leadingXValue $leadingYValue $characterToMove $map $map_width
+		mark_source_map	"$map"
+
+		change_map_element $trailingXValue $trailingYValue $replacementCharacter $map $map_width
+		mark_source_map	"$map"
+		display_map
+		sleep 2
+
+
+		[[ $xMod -ne 0 ]] && leadingXValue=$(( $leadingXValue + $xMod )) ; trailingXValue=$(( $leadingXValue - $xMod ))
+		[[ $yMod -ne 0 ]] && leadingYValue=$(( $leadingYValue + $yMod )) ; trailingYValue=$(( $leadingYValue - $yMod ))
+		((loopsCompleted++))
+	done
+
+}
+
+
+
 
 
 

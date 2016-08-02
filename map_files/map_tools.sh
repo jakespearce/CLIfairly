@@ -158,6 +158,45 @@ right(){
 }
 
 
+return_map_element(){
+
+	local target_x=$1
+	local target_y=$2
+	local inspectMap=$3
+	local mapWidth=$4
+
+	local y_count=1
+	local x_count=1
+	local IFS_OLD=$IFS
+	local IFS=;
+
+	while read -r row; do
+	
+		if [ "$y_count" -eq "$target_y" ]; then
+			x_charNewLine=0
+			target_yLine=$( echo -n $row )
+		
+			while read -rn1 xCharacter; do
+				((x_charNewLine++))
+				
+				if [ "$x_count" -eq "$target_x" ]; then
+					returnedMapElement="$xCharacter"
+				fi
+
+				((x_count++))
+			done <<< $target_yLine
+
+		fi
+
+		((y_count++))
+
+	done < "$inspectMap"
+
+	local IFS=$IFS_OLD
+
+}
+
+
 # TODO
 # Our character disappears from the map when we're moving other characters
 # Write something that identifies the previous tile that the moving character was on.
@@ -188,24 +227,44 @@ move_map_element(){
 	leadingYValue=$(( $yInitial - $yMod ))
 	trailingYValue=$yInitial
 
+	return_map_element $x $y "$map" "$map_width"
+	elementPlayerStandingOn="$returnedMapElement"
+
 	until [ $loopsCompleted -eq $absDiff ]; do
 
 		# this function call changes the map for the 'leading' character
-		change_map_element $leadingXValue $leadingYValue $characterToMove $map $map_width
+		change_map_element $leadingXValue $leadingYValue $characterToMove "$map" "$map_width"
 		mark_source_map	"$map"
 
-		change_map_element $trailingXValue $trailingYValue $replacementCharacter $map $map_width
+		# for the player character so it doesn't disappear
+		change_map_element $x $y $playerCharacter "$map" "$map_width"
+		mark_source_map "$map"
+
+		change_map_element $trailingXValue $trailingYValue $replacementCharacter "$map" "$map_width"
 		mark_source_map	"$map"
 		display_map
-		sleep 2
+		sleep 1
 
 
 		[[ $xMod -ne 0 ]] && leadingXValue=$(( $leadingXValue + $xMod )) ; trailingXValue=$(( $leadingXValue - $xMod ))
 		[[ $yMod -ne 0 ]] && leadingYValue=$(( $leadingYValue + $yMod )) ; trailingYValue=$(( $leadingYValue - $yMod ))
+
+		# returns the character element occupying (x,y) on the map as $replacementCharacter
+		return_map_element $leadingXValue $leadingYValue "$map" "$map_width"
+		replacementCharacter="$returnedMapElement"
+
 		((loopsCompleted++))
 	done
 
+	# 1) Mark the element the player is standing on with what it was before the player stood there
+	# 2) Mark the source map with this element
+	# 3) Finally, write a 'soft' change to the map (ie. not marking the source map) with the playerChar so when the character moves there's no ghosting
+	change_map_element $x $y "$elementPlayerStandingOn" "$map" "$map_width"
+	mark_source_map "$map"
+	change_map_element $x $y "$playerCharacter" "$map" "$map_width"
+	display_map
 }
+
 
 
 

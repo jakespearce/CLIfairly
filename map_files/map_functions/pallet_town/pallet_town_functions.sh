@@ -81,7 +81,7 @@ interaction(){
 	# signpost thing
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 4 -a "$x_element" -le 6 ]; then
 #		echo "Sign post: \"Gary's house\"" TEMPORARILY CHANGED FOR TESTING
-		move_map_element 24 10 21 10 L T "$map"
+		move_map_element 24 10 20 10 L "." "$map" # full stop because that's the tile we've decided the L is standing on.
 	fi
 
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 23 -a "$x_element" -le 25 ]; then

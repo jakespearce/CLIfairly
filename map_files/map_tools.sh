@@ -15,6 +15,7 @@ get_map_info(){
     # depending on what map the character is on, we load a different set of map functions. see map_function_conditions function
     current_map_functions="${map_functions[$current_map_char_is_on]}"
 	current_map_quests="${map_quests[$current_map_char_is_on]}"
+	current_map_text_prompts="${text_prompts[$current_map_char_is_on]}"
     source "$current_map_functions"
 	source "$current_map_quests"
 }
@@ -201,6 +202,8 @@ return_map_element(){
 # Our character disappears from the map when we're moving other characters
 # Write something that identifies the previous tile that the moving character was on.
 # This will be $replacementCharacter
+# Usage: move_map_element $xInitial $yInitial $xFinal $yFinal $characterToMove $replacementCharacter $map
+# Example: move_map_element 24 10 20 10 L "." "$map"
 
 move_map_element(){
 
@@ -264,11 +267,6 @@ move_map_element(){
 	change_map_element $x $y "$playerCharacter" "$map" "$map_width"
 	display_map
 }
-
-
-
-
-
 
 
 

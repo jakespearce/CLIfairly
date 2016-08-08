@@ -20,7 +20,7 @@ calculate_whitespace(){
     string_length=$2
 	whitespace_character=$3
     whitespace_length=$(( ${whitespace_max} - ${string_length} ))
-    whitespace="$( head -c "$whitespace_length" < /dev/zero | tr '\0' $whitespace_character)"
+    whitespace="$( head -c "$whitespace_length" < /dev/zero | tr '\0' "$whitespace_character" )"
 }
 
 draw_HPbar(){
@@ -104,5 +104,41 @@ read_pokemon_file(){
 
 
 }
+
+
+rolling_dialogue(){
+
+    lineToStartAt=$1
+    lineToEndAt=$2
+    dialogueFile=$3
+    whitespace_character=" "
+
+    local count=0
+
+        while read line; do
+            ((count++)) 
+                
+            if [ $count -ge $lineToStartAt ]; then  
+				
+                stringLength=${#line}
+                calculate_whitespace 38 $stringLength "$whitespace_character"
+				
+				clear
+				cat "${map_rw_path}/marked_map_output"
+                echo "o----------------------------------------o"
+                echo "|                                        |"
+                echo "| ${line}${whitespace} |"
+                echo "|                                        |"
+                echo "o----------------------------------------o"
+                read -n1 input < /dev/tty
+                clear
+                cat "${map_rw_path}/marked_map_output"
+                [[ $count -eq $lineToEndAt ]] && return 1
+        fi  
+
+        done < "$dialogueFile"
+
+}
+
 
 

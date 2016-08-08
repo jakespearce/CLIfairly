@@ -66,7 +66,7 @@ map_function_conditions(){
 
 	# first_oak_quest
 	if [ "$y_element" -eq 2 -a "$x_element" -ge 21 -a "$x_element" -le 24 ]; then
-		# function is from pallet_town_quests.sh, which is sourced 
+		# source: pallet_town_quests.sh
 		first_oak_quest
 	fi
 
@@ -80,12 +80,14 @@ interaction(){
 
 	# signpost thing
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 4 -a "$x_element" -le 6 ]; then
-#		echo "Sign post: \"Gary's house\"" TEMPORARILY CHANGED FOR TESTING
-		move_map_element 24 10 20 10 L "." "$map" # full stop because that's the tile we've decided the L is standing on.
+		# source: tools.sh
+		rolling_dialogue 2 2 "$current_map_text_prompts"
+
 	fi
 
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 23 -a "$x_element" -le 25 ]; then
-		echo "Sign post: \"My house\""
+		rolling_dialogue 5 5 "$current_map_text_prompts"
+
 	fi
 
 

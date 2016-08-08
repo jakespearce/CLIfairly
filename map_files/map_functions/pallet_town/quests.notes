@@ -1,0 +1,36 @@
+
+Oak dialogue for the first quest
+
+Oak: Hey! Wait! Don't go out!
+(A question mark appears above the player's head. It disappears when the player clicks a button)
+(Oak approaches from the south)
+Oak: It's unsafe! Wild Pokemon live in tall grass!
+You need your own Pokemon for your protection.
+I know!
+Here, come with me!
+(Oak leads the player into his mansion)
+(Once in the mansion, Oak walks north and stands at the end of the mansion)
+(The player shouldn't be able to leave the mansion)
+(After speaking to Oak...)
+RED: Gramps! I'm fed up with waiting!
+Oak: RED? Let me think...
+Oh, that's right, I told you to come! Just wait!
+Here, PLAYER!
+There are 3 Pokemon here!
+Haha!
+They are inside the POKEBALLS
+When I was young, I was a serious Pokemon trainer!
+In my old age, I have only 3 left, but you can have one! Choose!
+RED: Hey! Gramps! What about me?
+OAK: Be patient! RED, you can have one too!
+(Player interacts with pokeballs. Player sees pokedex entry for each pokemon)
+Sample dialogue after this: So, you want the water Pokemon, SQUIRTLE? Y/N
+After picking: This Pokemon is really energetic! 
+PLAYER recieved a SQUIRTLE!
+Do you want to give a nickname to SQUIRTLE? Y/N
+(After picking and naming)
+RED: I'll take this one, then!
+(Red received a BULBASAUR!) 
+(player tries to walk off)
+RED: Wait PLAYER! Let's check out our Pokemon! Come on, I'll take you on!
+(Battle commences!) 

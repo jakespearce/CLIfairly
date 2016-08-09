@@ -121,13 +121,38 @@ rolling_dialogue(){
             if [ $count -ge $lineToStartAt ]; then  
 				
                 stringLength=${#line}
-                calculate_whitespace 38 $stringLength "$whitespace_character"
-				
+				# First work out half the total whitespace length
+				halfTotalWhiteLength=$( echo "scale=1; ( 40 - $stringLength ) / 2" | bc )
+
+				# If half the total whitespace length is not an integer then 
+				if [[ $halfTotalWhiteLength =~ [0-9]\.[5] ]]; then
+					# rightHandWhiteSpace rounds up to give us more whitespace on the right
+					rightHandWhiteSpaceLength=$( echo "$halfTotalWhiteLength / 1 + 1" | bc )
+					leftHandWhiteSpaceLength=$( echo "$halfTotalWhiteLength / 1" | bc )
+
+					# For RHS first:
+					# stringLength redefined to be total length of text string plus LHS
+					stringLengthForRHS=$(( $stringLength + $leftHandWhiteSpaceLength ))
+					calculate_whitespace 40 "$stringLengthForRHS" "$whitespace_character"
+					rightHandWhiteSpace="$whitespace"
+
+					# For LHS next:
+					# stringLength redefined to be the total length of text string plus RHS
+					stringLengthForLHS=$(( $stringLength + $rightHandWhiteSpaceLength ))
+					calculate_whitespace 40 "$stringLengthForLHS" "$whitespace_character"
+					leftHandWhiteSpace="$whitespace"
+				else
+					halfTotalWhiteLength=$( echo "$halfTotalWhiteLength / 1" | bc )
+					totalStringLength=$(( $stringLength + $halfTotalWhiteLength ))
+                	calculate_whitespace 40 $totalStringLength "$whitespace_character"
+					leftHandWhiteSpace="$whitespace"
+					rightHandWhiteSpace="$whitespace"
+				fi
 				clear
 				cat "${map_rw_path}/marked_map_output"
                 echo "o----------------------------------------o"
                 echo "|                                        |"
-                echo "| ${line}${whitespace} |"
+                echo "|${leftHandWhiteSpace}${line}${rightHandWhiteSpace}|"
                 echo "|                                        |"
                 echo "o----------------------------------------o"
                 read -n1 input < /dev/tty

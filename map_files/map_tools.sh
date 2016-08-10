@@ -220,14 +220,14 @@ move_map_element(){
 	yDiff=$(( $yFinal - $yInitial )) 
 	if [ $xDiff -ne 0 ]; then
 		[[ $xDiff -lt 0 ]] && xMod=-1 || xMod=1 ; yMod=0 ; absDiff=$( echo "sqrt(${xDiff}^2)" | bc )
-	else
-		[[ $yDiff -lt 0 ]] && yMod=-1 || yMod=1; xMod=0 ; absDiff=$( echo "sqrt($yxDiff}^2)" | bc )
+	elif [ $yDiff -ne 0  ]; then
+		[[ $yDiff -lt 0 ]] && yMod=-1 || yMod=1 ; xMod=0 ; absDiff=$( echo "sqrt(${yDiff}^2)" | bc )
 	fi
 
 	loopsCompleted=0
 	leadingXValue=$(( $xInitial + $xMod ))
-	trailingXValue=$xInitial	
-	leadingYValue=$(( $yInitial - $yMod ))
+	trailingXValue=$xInitial
+	leadingYValue=$(( $yInitial + $yMod ))
 	trailingYValue=$yInitial
 
 	return_map_element $x $y "$map" "$map_width"
@@ -268,5 +268,7 @@ move_map_element(){
 	display_map
 }
 
-
+delay_event(){
+	sleep 0.1
+}
 

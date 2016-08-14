@@ -46,6 +46,11 @@ map_function_conditions(){
 		\( "$y_element" -eq 15 -a "$x_element" -ge 19 -a "$x_element" -le 26 \) -o \
 		\( "$y_element" -eq 15 -a "$x_element" -ge 29 -a "$x_element" -le 36 \) \
 		]; then
+		# If we've spoken to Oak already his mansion unlocks for us.
+		if [ "$x_element" -ge 26 -a "$x_element" -le 29 -a "$y_element" -le 14 ]; then
+			get_quest_progress_value 2
+			[[ $quest_status -eq 1 ]] && canWeMove="yes" 
+		fi
 		canWeMove="no"
 	fi
 
@@ -60,6 +65,14 @@ map_function_conditions(){
 		]; then
 		canWeMove="no"
 	fi
+
+	if [ "$x_element" -ge 26 -a "$x_element" -le 29 -a "$y_element" -le 14 ]; then
+			change_conf_value "character_files/character.cfg" "current_map_char_is_on" 3
+			get_new_map_info_set_start_pos 13 8
+	fi
+
+ 
+
 
 #------- Quests ---------#
 

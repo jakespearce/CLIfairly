@@ -50,8 +50,28 @@ get_quest_progress_value(){
 	done < "${HOME}/pokemon/gui/character_files/character_progress.tab"
 }
 
-# reads a pokemon file and extracts values to variables.
 
+# Changes a value in character_files/character_progress.tab
+# Only even lines contain actual quest data.
+change_quest_progress_value(){
+
+	target_quest=$1
+	progress_value=$2 # Will be either 0, 1 or 2.
+	local count=0
+	while read character_progress_line_; do
+		((count++))
+		if [ "$count" -eq "$target_quest" ]; then
+			echo "$progress_value"
+		else
+			echo "$character_progress_line_"
+		fi
+	done < "${HOME}/pokemon/gui/character_files/character_progress.tab" > "${HOME}/pokemon/gui/character_files/character_progress.tab.tmp"
+
+	mv "${HOME}/pokemon/gui/character_files/character_progress.tab.tmp" "${HOME}/pokemon/gui/character_files/character_progress.tab" 
+
+}
+
+# reads a pokemon file and extracts values to variables.
 read_pokemon_file(){
 
 	fileToRead=$1	
@@ -164,6 +184,8 @@ rolling_dialogue(){
         done < "$dialogueFile"
 
 }
+
+
 
 
 

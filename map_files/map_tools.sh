@@ -235,6 +235,8 @@ move_map_element(){
 
 	until [ $loopsCompleted -eq $absDiff ]; do
 
+		read -t 0.1 -N 255 # TODO Test this and see if it works.
+
 		# this function call changes the map for the 'leading' character
 		change_map_element $leadingXValue $leadingYValue $characterToMove "$map" "$map_width"
 		mark_source_map	"$map"
@@ -268,6 +270,7 @@ move_map_element(){
 	display_map
 }
 
+# Dubious usage: I don't think this is used anywhere. Candidate for deletion.
 delay_event(){
 	sleep 0.1
 }

@@ -43,15 +43,20 @@ map_function_conditions(){
 	if [ \
 		\( "$y_element" -eq 12 -a "$x_element" -ge 20 -a "$x_element" -le 35 \) -o \
 		\( "$y_element" -ge 13 -a "$y_element" -le 14 -a "$x_element" -ge 19 -a "$x_element" -le 36 \) -o \
-		\( "$y_element" -eq 15 -a "$x_element" -ge 19 -a "$x_element" -le 26 \) -o \
-		\( "$y_element" -eq 15 -a "$x_element" -ge 29 -a "$x_element" -le 36 \) \
+		\( "$y_element" -eq 15 -a "$x_element" -ge 19 -a "$x_element" -le 36 \) \
 		]; then
-		# If we've spoken to Oak already his mansion unlocks for us.
-		if [ "$x_element" -ge 26 -a "$x_element" -le 29 -a "$y_element" -le 14 ]; then
-			get_quest_progress_value 2
-			[[ $quest_status -eq 1 ]] && canWeMove="yes" 
-		fi
 		canWeMove="no"
+		# If we've spoken to Oak already his mansion unlocks for us...
+		if [ "$y_element" -eq 15 -a "$x_element" -ge 27 -a "$x_element" -le 28 ]; then
+			get_quest_progress_value 2
+			# If the first Oak quest is complete, change map to oak's mansion.
+			if [ $quest_status -eq 1 ]; then
+				change_conf_value "character_files/character.cfg" "current_map_char_is_on" 3
+				get_new_map_info_set_start_pos 13 8
+				display_map
+				canWeMove="yes"
+			fi
+		fi
 	fi
 
 	# map edges starting from west and going clockwise.
@@ -66,10 +71,10 @@ map_function_conditions(){
 		canWeMove="no"
 	fi
 
-	if [ "$x_element" -ge 26 -a "$x_element" -le 29 -a "$y_element" -le 14 ]; then
-			change_conf_value "character_files/character.cfg" "current_map_char_is_on" 3
-			get_new_map_info_set_start_pos 13 8
-	fi
+#	if [ "$x_element" -ge 27 -a "$x_element" -le 28 -a "$y_element" -eq 14 ]; then
+#			change_conf_value "character_files/character.cfg" "current_map_char_is_on" 3
+#			get_new_map_info_set_start_pos 13 8
+#	fi
 
  
 

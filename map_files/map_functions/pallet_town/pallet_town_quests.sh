@@ -327,12 +327,21 @@ first_oak_quest(){
 	# At this point, we need X to disappear. X is walking into the house so we replace it with the floor tile of the door. This is also where we set line 2 of character_files/character_progress.tab to complete (so we can have access to the mansion)
 	change_map_element 27 15 '[' "$map" $map_width
 	mark_source_map "$map"
+	# We also don't want the player character to ghost so we'll mark the source map for where player is standing too
+	change_map_element 27 16 '|' "$map" $map_width
+	mark_source_map "$map"
+
 	# Now we change the quest progress value in line 2 of character_files/character_progress.tab. 
 	# change_quest_progress $target_quest $progress_value
 	change_quest_progress_value 2 1
 	display_map
 	mark_source_map "$map"
 
+	# Finall we change x and y so that they reflect where the player got to when they were being moved.
+	y=16
+	x=27
+	# Now push the player 'up' which should send them into Oak's dungeon :)
+	up
 
  	#TODO Monday: Figure out why oak_mansion doesn't display immediately when player enters map. This is strange because this works fine with the inside_house map
 

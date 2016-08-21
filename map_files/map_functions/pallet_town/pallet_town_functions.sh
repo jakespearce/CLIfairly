@@ -14,6 +14,12 @@ map_function_conditions(){
 			get_new_map_info_set_start_pos 8 8
 		fi
 
+		# Enter Gary's house (top right of the map)
+		if [ "$x_element" -eq 28 -o "$x_element" -eq 29 ]; then
+			change_conf_value "character_files/character.cfg" "current_map_char_is_on" 5
+			get_new_map_info_set_start_pos 9 8
+		fi
+
     # go to route blahblah - deprecated but i'll come to this later
 	elif [ "$y_element" -eq 1 -a "$x_element" -ge 21 -a "$x_element" -le 24 ]; then
 			change_conf_value "character_files/character.cfg" "current_map_char_is_on" 3

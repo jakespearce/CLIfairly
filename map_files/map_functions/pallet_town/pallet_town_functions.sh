@@ -26,6 +26,8 @@ map_function_conditions(){
 			get_new_map_info_set_start_pos 16 12
 	fi
 
+
+
   	# stop being able to walk through the leftmost house
 	if [ \
 		\( "$y_element" -eq 6 -a "$x_element" -ge 10 -a "$x_element" -le 15 \) -o \
@@ -37,14 +39,16 @@ map_function_conditions(){
 	fi
 
 	# stop being able to walk through the rightmost house
+	# V1
 	if [ \
 		\( "$y_element" -eq 6 -a "$x_element" -ge 29 -a "$x_element" -le 34 \) -o \
-		\( "$y_element" -eq 7 -a "$x_element" -ge 9 -a "$x_element" -le 16 \) -o \
-		\( "$y_element" -ge 8 -a "$y_element" -le 9 -a "$x_element" -eq 8 \) -o \
-		\( "$y_element" -ge 8 -a "$y_element" -le 9 -a "$x_element" -ge 11 -a "$x_element" -le 17 \) \
+		\( "$y_element" -eq 7 -a "$x_element" -ge 28 -a "$x_element" -le 35 \) -o \
+		\( "$y_element" -ge 8 -a "$y_element" -le 9 -a "$x_element" -eq 27 \) -o \
+		\( "$y_element" -ge 8 -a "$y_element" -le 9 -a "$x_element" -ge 30 -a "$x_element" -le 36 \) \
 		]; then
 		canWeMove="no"
 	fi
+
 
 	# Stop being able to walk through Oak's mansion
 	if [ \
@@ -66,24 +70,20 @@ map_function_conditions(){
 		fi
 	fi
 
-	# map edges starting from west and going clockwise.
+	# Map edges starting from North and going clockwise.
 	if [ \
 		\( "$y_element" -ge 1 -a "$y_element" -le 18 -a "$x_element" -eq 1 \) -o \
-		\( "$y_element" -eq 18 -a "$x_element" -ge 1 -a "$x_element" -le 8 \) -o \
-		\( "$y_element" -eq 18 -a "$x_element" -ge 15 -a "$x_element" -le 41 \) -o \
-		\( "$y_element" -ge 1 -a "$y_element" -le 17 -a "$x_element" -eq 41 \) -o \
 		\( "$y_element" -eq 2 -a "$x_element" -ge 1 -a "$x_element" -le 20 \) -o \
-		\( "$y_element" -eq 2 -a "$x_element" -ge 25 -a "$x_element" -le 41 \) \
+		\( "$y_element" -eq 2 -a "$x_element" -ge 25 \) -o \
+		\( "$y_element" -ge 1 -a "$x_element" -eq 42 \) -o \
+		\( "$y_element" -eq 17 -a "$x_element" -eq 2 \) -o \
+		\( "$y_element" -eq 18 -a "$x_element" -ge 1 -a "$x_element" -le 8 \) -o \
+		\( "$y_element" -ge 15 -a "$x_element" -ge 9 -a "$x_element" -le 14 \) -o \
+		\( "$y_element" -eq 18 -a "$x_element" -ge 15 \) \
 		]; then
 		canWeMove="no"
 	fi
 
-#	if [ "$x_element" -ge 27 -a "$x_element" -le 28 -a "$y_element" -eq 14 ]; then
-#			change_conf_value "character_files/character.cfg" "current_map_char_is_on" 3
-#			get_new_map_info_set_start_pos 13 8
-#	fi
-
- 
 
 
 #------- Quests ---------#
@@ -103,19 +103,31 @@ map_function_conditions(){
 
 interaction(){
 
-	# signpost thing
+	# My house sign
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 4 -a "$x_element" -le 6 ]; then
 		# source: tools.sh
 		rolling_dialogue 2 2 "$current_map_text_prompts"
-
 	fi
 
+	# Gary's house sign
 	if [ "$y_element" -eq 10 -a "$x_element" -ge 23 -a "$x_element" -le 25 ]; then
 		rolling_dialogue 5 5 "$current_map_text_prompts"
-
 	fi
 
+	# Little girl ("G")
+	if [ "$y_element" -ge 11 -a "$y_element" -le 13 -a "$x_element" -ge 4 -a "$x_element" -le 6 ]; then
+		rolling_dialogue 21 22 "$current_map_text_prompts"
+	fi 
 
+	# Main town sign near to Little girl
+	if [ "$y_element" -ge 12 -a "$y_element" -le 13 -a "$x_element" -ge 11 -a "$x_element" -le 15 ]; then
+		rolling_dialogue 25 26 "$current_map_text_prompts"
+	fi
+
+	# Fat Man ("M")
+	if [ "$y_element" -ge 16 -a "$y_element" -le 18 -a "$x_element" -ge 18 -a "$x_element" -le 20 ]; then
+		rolling_dialogue 16 18 "$current_map_text_prompts"
+	fi
 }
 
 

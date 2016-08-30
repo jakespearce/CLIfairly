@@ -66,36 +66,36 @@ interaction(){
 
 	# Bookshelf top left
 	if [ \
-		\( "$y_element" -eq 3 -a "$x_element" -le 6 \) \
+		\( "$y" -eq 3 -a "$x" -le 6 \) \
 		]; then
 		rolling_dialogue 1 1 "$current_map_text_prompts"
 
 	elif [ \
-		\( "$y_element" -eq 2 -a "$x_element" -ge 10 -a "$x_element" -le 14 \) \
+		\( "$y" -eq 2 -a "$x" -ge 10 -a "$x" -le 14 \) \
 		]; then
 		rolling_dialogue 2 2 "$current_map_text_prompts"
 
 	# Bookshelf top right
 	elif [ \
-		\( "$y_element" -eq 3 -a "$x_element" -ge 18 \) \
+		\( "$y" -eq 3 -a "$x" -ge 18 \) \
 		]; then
 		rolling_dialogue 1 1 "$current_map_text_prompts"
 
 	# Gary's sister
 	elif [ \
-		\( "$y_element" -ge 6 -a "$y_element" -le 8 -a "$x_element" -ge 16 -a "$x_element" -le 18 \) \
+		\( "$y" -ge 6 -a "$y" -le 8 -a "$x" -ge 16 -a "$x" -le 18 \) \
 		]; then
 		rolling_dialogue 6 7 "$current_map_text_prompts"
 
 	# Plant bottom right
 	elif [ \
-		\( "$y_element" -ge 8 -a "$x_element" -ge 21 \) \
+		\( "$y" -ge 8 -a "$x" -ge 21 \) \
 		]; then
 		rolling_dialogue 3 3 "$current_map_text_prompts"
 
 	# Plant bottom left
 	elif [ \
-		\( "$y_element" -ge 8 -a "$x_element" -le 3 \) \
+		\( "$y" -ge 8 -a "$x" -le 3 \) \
 		]; then
 		rolling_dialogue 3 3 "$current_map_text_prompts"
 	fi

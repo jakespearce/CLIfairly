@@ -55,5 +55,45 @@ map_function_conditions(){
 		canWeMove="no"
 	fi
 
+}
+
+
+interaction(){
+
+	echo "${x} = x and ${y} = y \n ${x_element} = x_element and ${y_element} = y_element"
+
+	# The Eastmost bookshelf
+	if [ \
+		\( "$y" -eq 7 -a "$x" -ge 1 -a "$x" -le 11 \) \
+		]; then
+		rolling_dialogue 13 13 "$current_map_text_prompts"
+	fi
+
+	# The Westmost bookshelf
+	if [ \
+		\( "$y" -eq 7 -a "$x" -ge 16 \) \
+		]; then
+		rolling_dialogue 13 13 "$current_map_text_prompts"
+	fi
+
+	# The Girl by the Eastmost bookshelf
+	if [ \
+		\( "$y" -eq 8 -a "$x" -le 4 \) \
+		]; then
+		rolling_dialogue 2 4 "$current_map_text_prompts"
+	fi
+
+	# The scientist just to the right of The Girl by the Easmost bookshelf
+	if [ \
+		\( "$y" -eq 8 -a "$x" -ge 6 -a "$x" -le 8 \) \
+		]; then
+		rolling_dialogue 7 7 "$current_map_text_prompts"
+	fi
+
+	if [ \
+		\( "$y" -eq 8 -a "$x" -ge 14 -a "$x" -le 16 \) \
+		]; then
+		rolling_dialogue 7 7 "$current_map_text_prompts"
+	fi
 
 }

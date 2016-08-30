@@ -44,7 +44,7 @@ map_function_conditions(){
 interaction() {
 
 	if [ \
-		\( "$y_element" -ge 4 -a "$y_element" -le 6 -a "$x_element" -ge 9 -a "$x_element" -le 13 \) \
+		\( "$y" -ge 4 -a "$y" -le 6 -a "$x_element" -ge 9 -a "$x_element" -le 13 \) \
 		]; then
 		rolling_dialogue 1 1 "$current_map_text_prompts"
 	fi

@@ -58,19 +58,19 @@ interaction(){
 
 	# TV
 	if [ \
-		\( "$y_element" -eq 3 -a "$x_element" -ge 10 -a "$x_element" -le 13 \) \
+		\( "$y" -eq 3 -a "$x" -ge 10 -a "$x" -le 13 \) \
 		]; then
 		rolling_dialogue 1 1 "$current_map_text_prompts"
 
 	# Bookshelf
 	elif [ \
-		\( "$y_element" -eq 3 -a "$x_element" -ge 2 -a "$x_element" -le 3 \) \
+		\( "$y" -eq 3 -a "$x" -ge 2 -a "$x" -le 3 \) \
 		]; then
 		rolling_dialogue 2 2 "$current_map_text_prompts"
 
 	# Mum
 	elif [ \
-		\( "$y_element" -ge 4 -a "$y_element" -le 6 -a "$x_element" -ge 16 -a "$x_element" -le 18 \) \
+		\( "$y" -ge 4 -a "$y" -le 6 -a "$x" -ge 16 -a "$x" -le 18 \) \
 		]; then
 		# There are a number of things Mum can say. They're laid out in lines 3-6 of $current_map_text_prompts.
 		# She randomly says one thing per interaction.

@@ -52,12 +52,6 @@ generate_pokemon_menu(){
 	declare -a specialARR
 	declare -a speedARR
 	declare -a majorAilmentARR
-	declare -a confusionARR
-	declare -a trappedARR
-	declare -a chargingUpARR
-	declare -a seededARR
-	declare -a substitutedARR
-	declare -a flinchedARR
 	declare -a levellingRateARR
 	declare -a catchRateARR
 	declare -a baseExpYieldARR
@@ -67,7 +61,7 @@ generate_pokemon_menu(){
 	while [ "$countdown" -lt "$pokemon_count" ]; do
 
 		((countdown++))		
-		while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMAX_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ HP_ attack_ defence_ special_ speed_ majorAilment_ confusion_ trapped_ chargingUp_ substituted_ flinched_ levellingRate_ catchRate_ baseExpYield_ currentExp_ nextLevelExp_; do
+		while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMAX_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ HP_ attack_ defence_ special_ speed_ majorAilment_ levellingRate_ catchRate_ baseExpYield_ currentExp_ nextLevelExp_; do
 			pokemonIDARR[$countdown]="$pokemonID_"
 			pokemonUniqueIDARR[$countdown]="$pokemonUniqueID_"
 			pokemonNameARR[$countdown]="$pokemonName_"
@@ -95,12 +89,6 @@ generate_pokemon_menu(){
 			specialARR[$countdown]="$special_"
 			speedARR[$countdown]="$speed_"
 			majorAilmentARR[$countdown]="$majorAilment_"
-			confusionARR[$countdown]="$confusion_"
-			trappedARR[$countdown]="$trapped_"
-			chargingUpARR[$countdown]="$chargingUp_"
-			seededARR[$countdown]="$seeded_"
-			substitutedARR[$countdown]="$substituted_"
-			flinchedARR[$countdown]="$flinched_"
 			levellingRateARR[$countdown]="$levellingRate_"
 			catchRateARR[$countdown]="$catchRate_"
 			baseExpYieldARR[$countdown]="$baseExpYield_"

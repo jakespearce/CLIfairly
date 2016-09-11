@@ -79,7 +79,7 @@ read_pokemon_file(){
 	#IFS = TAB
 	IFS="	"
 
-        while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMAX_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ HP_ attack_ defence_ special_ speed_ majorAilment_ confusion_ trapped_ chargingUp_ seeded_ substituted_ flinched_ levellingRate_ catchRate_ baseExpYield_ currentExp_ nextLevelExp_; do
+        while read -r pokemonID_ pokemonUniqueID_ pokemonName_ pokemonGivenName_ inventoryStatus_ currentHP_ level_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMAX_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ HP_ attack_ defence_ special_ speed_ majorAilment_ levellingRate_ catchRate_ baseExpYield_ currentExp_ nextLevelExp_; do
             pokemonID="$pokemonID_"
             pokemonUniqueID="$pokemonUniqueID_"
             pokemonName="$pokemonName_"
@@ -107,12 +107,6 @@ read_pokemon_file(){
             special="$special_"
             speed="$speed_"
             majorAilment="$majorAilment_"
-            confusion="$confusion_"
-            trapped="$trapped_"
-            chargingUp="$chargingUp_"
-            seeded="$seeded_"
-            substituted="$substituted_"
-            flinched="$flinched_"
             levellingRate="$levellingRate_"
             catchRate="$catchRate_"
             baseExpYield="$baseExpYield_"

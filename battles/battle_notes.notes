@@ -1,0 +1,57 @@
+The Attribute file for a Pokemon:
+Tab separated:
+pokemonID
+pokemonUniqueID
+pokemonName
+Level
+HPMax
+HPCurrent
+Attack
+Defense
+Special
+Speed
+Accuracy
+Evaision
+typeOne
+typeTwo
+moveOne
+moveTwo
+moveThree
+moveFour
+ppOne
+ppTwo
+ppThree
+ppFour
+ppOneMax
+ppTwoMax
+ppThreeMax
+ppFourMax
+majorAilment
+confusion
+trapped
+seeded
+substituted
+flinch
+semi-invulnerable
+
+Evaision and Accuracy
+These range in value from 0 to 12.
+An unmodified Accuracy/evaision value is = 6
+To calculate the probability that a move will hit:
+1) Subtract Evaision from Accuracy (Accuracy will be the accuracy of the move)
+eg. 9 - 8 = 1
+2) Plug the resultant value into an array variable after adding 6 to it
+eg. hitChance[7] = 1.33
+3) Work out chance move will hit:
+hitChance * moveAccuracy
+eg. 1.33 * 0.95
+
+
+
+
+
+
+
+
+
+

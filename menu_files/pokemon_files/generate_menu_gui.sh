@@ -54,7 +54,7 @@ generate_pokemon_menu(){
 	declare -a majorAilmentARR
 	declare -a confusionARR
 	declare -a trappedARR
-	declare -a charingUpARR
+	declare -a chargingUpARR
 	declare -a seededARR
 	declare -a substitutedARR
 	declare -a flinchedARR

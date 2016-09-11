@@ -9,9 +9,10 @@ KeyItem: If this field is populated with a 1 then the item is a key item.
 Context: A series of numbers denoting what contexts the item can be used in. 
 0 = Never (eg. Nugget, Key Items such as Dome and Helix Fossils)
 1 = Any time, Anywhere (eg. Potion) [supersedes any other value]
-2 = In battle (eg. Pokeball) 
-3 = Outside, incl. caves (eg. Bike)
-4 = Caves only (eg. Escape Rope)
-5 = Water edge, or maybe in water (eg. Fishing Rod)
+2 = In battle (eg. Pokeball)
+3 = Outside incl. houses.
+4 = Outside not including houses, incl. caves (eg. Bike)
+5 = Caves only (eg. Escape Rope)
+6 = Water edge, or maybe in water (eg. Fishing Rod)
 MORE TO COME
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This file is simply for testing purposes since there's no gui yet
+# Usage: $ bash get_pokemon_status.sh $pokemonBattleAttributeFile
 
 source battle_tools.sh
 

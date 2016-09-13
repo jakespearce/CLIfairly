@@ -29,6 +29,8 @@ generate_attribute_battleFile(){
 }
 
 
+#TODO Add 'unmodified' versions of attack, defense, special and speed to this file
+#TODO Also add the attack, defense, special and speed stat stage fields to this file
 read_attribute_battleFile(){
 
 	fileToRead="$1"

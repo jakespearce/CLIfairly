@@ -135,7 +135,7 @@ while read -r move_id; do
 	touch tempPP
 	# while we're here we may as well grab the base PP values for each attack while we're here
 	IFS='	'
-	while read move_id_ move_name_ move_type_ PP_; do
+	while read move_id_ move_name_ move_type_ PP_ moveElement_ accuracy_ power_; do
 		
 		if [ "$move_id" -eq "$move_id_"  ]; then
 			echo "${move_name_} - move name. ${PP_} - PP."	

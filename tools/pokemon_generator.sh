@@ -3,7 +3,7 @@
 # this file literally just generates pokemon for when they're seen for the first time.
 # TODO when this goes live, change the battle path back to /pokemon/gui/battles/enemy (or somwhere else)
 
-base_stat_file=$1 # /pokemon/gui/pokemon_database/base_stats/somethingsomething.bulbasaur
+base_stat_file=$1 # /pokemon/gui/pokemon_database/base_stats/001.stats
 move_file=$2 # /pokemon/gui/pokemon_database/move_list/001.movesBULBASAUR
 # still undecided on where level value will come from.
 level=$3
@@ -41,6 +41,8 @@ for i in $attack_IV $defense_IV $special_IV $speed_IV; do
 
 done
 
+IFS_OLD=$IFS
+IFS='	' # tabs
 # now obtain the base stats, typeOne, typeTwo, pokemonID, pokemonName, levelling rate, catch rate, baseExpYield
 while read HP_base_ attack_base_ defense_base_ special_base_ speed_base_ typeOne_ typeTwo_ pokemonID_ pokemonName_ levellingRate_ catchRate_ baseExpYield_; do
 	HP_base=$HP_base_
@@ -55,7 +57,8 @@ while read HP_base_ attack_base_ defense_base_ special_base_ speed_base_ typeOne
 	levellingRate=$levellingRate_
 	catchRate=$catchRate_
 	baseExpYield=$baseExpYield_
-done < $base_stat_file
+done < "$base_stat_file"
+IFS=$IFS_OLD
 
 calculate_HP(){
 

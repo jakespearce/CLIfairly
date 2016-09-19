@@ -4,34 +4,32 @@ owned_pokemon_path="${HOME}/pokemon/gui/character_files/owned_pokemon"
 battle_filetmp_path="${HOME}/pokemon/gui/battles/tmp_files"
 PCPokemonFile="${battle_filetmp_path}/PCPokemon.pokemon"
 NPCPokemonFile="${battle_filetmp_path}/NPCPokemon.pokemon"
+moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.tab"
+type_value_key="${HOME}/pokemon/gui/tools/type_value_key_lookup.tab"
+type_matchups_array="${HOME}/pokemon/gui/battles/arrays/type_matchups.cfg"
+base_stats_path="${HOME}/pokemon/gui/pokemon_database/base_stats/"
 
-zeroValue=0
-
+source "$type_matchups_array"
 source "${HOME}/pokemon/gui/tools/tools.sh"
 
-# This function generates 
+
+# This function generates the "battleFile" for a pokemon (a .tab file which stores its in-battle stats)
+# First argument is the full path and name of the file to generate, second argument is the pokemonUniqueID of the pokemon we want to generate the battleFile for.
+# eg. generate_attribute_battleFile "$PCPokemonFile" 1093.001
 generate_attribute_battleFile(){
 
-	#TODO In future this will be an argument specifying name and location.
 	fileToGenerate="$1"
-	#TODO in future this will be an argument specifying the Pokemon file we want to generate
-	# an attribute battleFile for.
 	targetPokemon="${owned_pokemon_path}/${2}"
 
-	#TODO this function will be supplied with an argument which will be the pokemon we want to generate battle
-	# files for.
-	# Random Pokemon is hardcoded for now
 	read_pokemon_file "$targetPokemon"
 	[[ ! -e "$fileToGenerate" ]] && touch "$fileToGenerate"
 	# Note: We may use the code below elsewhere so this may become its own function one day.
 	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t0\t0\t0\t0\t0" >> "$fileToGenerate"
-
-
 }
 
 
-#TODO Add 'unmodified' versions of attack, defense, special and speed to this file
-#TODO Also add the attack, defense, special and speed stat stage fields to this file
+# Extracts values from a give pokemon's battleFile
+# Argument must be full path + name of battleFile
 read_attribute_battleFile(){
 
 	fileToRead="$1"
@@ -87,24 +85,298 @@ read_attribute_battleFile(){
 }
 
 
-#generate_attribute_battleFile "$PCPokemonFile" 1093.001
+# Extracts values from the moves.tab file
+# Only argument is the ID of the move we want to extract data for.
+read_moves_file(){
+
+	moveToRead="$1"
+	IFS_OLD=$IFS
+	IFS='	' # TAB
+	while read moveID_ moveName_ moveMachineType_ moveppMax_ moveType_ moveAccuracy_ movePower_; do
+
+		if [ "$moveID_" = "$moveToRead" ]; then
+			moveID="$moveID_"
+			moveName="$moveName_"
+			moveMachineType="$moveMachineType_"
+			moveppMax="$moveppMax_"
+			moveType="$moveType_"
+			moveAccuracy="$moveAccuracy_"
+			movePower="$movePower_"
+
+		fi
+
+	done < "$moves_file"
+	IFS=$IFS_OLD	
+}
 
 
+# Argument will be all caps string representing an element eg. ELECTRIC
+# Function translates ELECTRIC into its corresponding integer value (see arrays/type_value_key)
+# The integer value we get from this can be plugged into arrays to get attributes of that element.
+translate_type_string_to_key(){
+
+	typeString="$1"
+	while read typeString_ typeValueKey_; do
+		if [ "$typeString_" = "$typeString" ]; then
+			typeValueKey="$typeValueKey_"
+		fi
+	done < "$type_value_key"
+}
+
+
+# Reads the base stats file for a given pokemon.
+# A given pokemon is expressed in the form of the pokemon species ID. eg. Bulbasaur = 001 ($targetPokemonSpeciesID)
+read_base_stats(){
+
+	targetPokemonSpeciesID="$1"
+	IFS_OLD=$IFS
+	IFS='	' # tab
+	while read HP_base_ attack_base_ defense_base_ special_base_ speed_base_ typeOne_ typeTwo_ pokemonID_ pokemonName_ levellingRate_ catchRate_ baseExpYield_; do
+	    HP_base=$HP_base_
+	    attack_base=$attack_base_
+	    defense_base=$defense_base_
+	    special_base=$special_base_
+	    speed_base=$speed_base_
+	    typeOne=$typeOne_
+	    typeTwo=$typeTwo_
+	    pokemonID=$pokemonID_
+	    pokemonName=$pokemonName_
+	    levellingRate=$levellingRate_
+	    catchRate=$catchRate_
+	    baseExpYield=$baseExpYield_
+	done < "${base_stats_path}${targetPokemonSpeciesID}.stats"
+	IFS=$IFS_OLD
+}
+
+
+#---- FUNCTIONS THAT CALCULATE MODIFIER VALUES ----#
+
+# Modifier values are: STAB, Type multiplier, Crit bonus, and finally a random number from 0.85-1.
+
+
+# This function could also be called "Does the move crit?" Crit bonus is a value from 1-2.
+# A value of 2 is a critical hit.
+# Parameteres:
+# PokemonSpeciesID
+# attackingPokemon (This is either NPCPokemon.pokemon or PCPokemon.pokemon)
+# critRateMultiplier (This always comes from the move script. This is how we're going to handle moves with high crit rates.)
+calculate_crit_bonus(){
+
+	local pokemonSpeciesID="$1"
+	# This will either be NPCPokemon.pokemon or PCPokemon.pokemon
+	local attackingPokemon="$2"
+	local critRateMultiplier="$3"
+	# There are only 8 moves in the game that have a non-base (1) crit bonus. These moves will supply that bonus as an argument to this function in their move scripts.
+	if [ -z $critRateMultiplier ]; then
+		critRateMultiplier=1
+	fi
+	# Read the battle attribute file for the attacking pokemon in order to get the battle crit_multiplier
+	read_attribute_battleFile "${battle_filetmp_path}/${attackingPokemon}.pokemon"
+	local critMultiplierAttribute=$crit_multiplier
+
+	read_base_stats "$pokemonSpeciesID"
+	local baseSpeed="$speed_base"
+
+	# Calculate critRate, generate random number between 1 and 255, if critRate > random then it's a crit.
+	local critRate=$( echo "( ${baseSpeed} * ${critRateMultiplier} * ${critMultiplierAttribute} ) / 2" | bc )
+	if [ $critRate -ge 256 ]; then
+		local critRate=255
+	fi
+	local randomValue=$( shuf -i 1-255 | head -1 )
+
+	if [ $critRate -gt $randomValue ]; then
+		criticalModifier=2
+	else
+		criticalModifier=1
+	fi
+
+	# Uncomment for testing
+
+#	echo -e "The critRateMultiplier (supplied by the move script) is ${critRateMultiplier}.\nThe critMultiplierAttribute, the crit value from the pokemon's attribute file, is ${critMultiplierAttribute}.\nThe base speed of the attacking pokemon is ${baseSpeed}.\nThe critRate, ${critRate}, needs to exceed ${randomValue} in order to be a crit.\nThe criticalModifier (1 = no crit, 2 = crit) is ${criticalModifier}."
+
+#	echo $pokemonSpeciesID
+#	echo $critRateMultiplier
+#	echo $critMultiplierAttribute
+#	echo $attackingPokemon
+#	echo $baseSpeed
+#	echo $critRate
+#	echo $randomValue
+}
+
+
+# STAB - Same type attack bonus (if the pokemon shares at least one type with the move its using then apply 1.5x)
+# This function takes 3 arguments: 
+# $1 - ID of the attack being used (integer)
+# $2 - typOne of the attacker (all-caps string ;))
+# $3 - typeTwo of the attacker (")
+calculate_STAB(){
+
+	# attackBeingUsed will be the ID of the attack eg. 44
+	local attackBeingUsed="$1"
+	local typeOne="$2"
+	local typeTwo="$3"
+
+	read_moves_file "$attackBeingUsed"
+
+	if [ "$typeOne" = "$moveType" -o "$typeTwo" = "$moveType" ]; then
+		STAB=1.5
+	else
+		STAB=1
+	fi
+}
+
+
+# This function takes three arguments, defending pokemon's types and attack's ID.
+# Defending pokemon's types are text in all caps eg. ICE. Attack's ID is eg. 44
+# Spits out $typeDamageBonus, which is calculated by multiplying together the two damage multipliers we get from
+# examining the attack type vs defender types. If the defending pokemon only has one type, then the non-existent second type's multiplier resolves to 1. Because we're lazy.
+# Eg. A Pokemon has two types, one of which the attack is super effective against (2x bonus) and one of which the attack is weak against (1/2x bonus.)
+# $typeDamageBonus = 1/2 * 2 = 1x damage multiplier overall
+calculate_type_damage_bonus(){
+
+	local attackBeingUsed="$1"
+	local defenderTypeOne="$2"
+
+	# If the pokmon doesn't have a secondary type set the key to 0.
+	# In our array table a value of 0 always resolves to 1 regardless of type of attack.
+	if [ "$3" = "NULL" ]; then
+		local typeValueKeyTwo=0
+	else
+		# Note: here, defenderTypeTwo is a string of text.
+		local defenderTypeTwo="$3"
+	fi
+
+	# Here we need to read type_value_key_lookup.tab and get the number values for each of the defending pokemon's types.
+	# defenderTypeOne first:
+	translate_type_string_to_key "$defenderTypeOne"
+	# typeValueKey is obtained in the translate_type_string_to_key function.
+	typeValueKeyOne="$typeValueKey"
+
+	if [ "$typeValueKeyTwo" == 0 ]; then
+		:
+	else
+		translate_type_string_to_key "$defenderTypeTwo"
+		typeValueKeyTwo="$typeValueKey"
+	fi
+
+	# Now get the TYPE of the attack being used.
+	# To get typeDamageBonus: TYPE[defenderTypeOne] * TYPE[defenderTypeTwo] 
+	# Eg. BUG[10] * BUG[14] = 1 * 1 = 1 (A BUG attack against an Ice and Water type pokemon)
+	read_moves_file "$attackBeingUsed"
+	local moveTypeofAttack="$moveType"
+
+	# Now to construct an array from moveTypeofAttack
+	# This could resolve to: ICE[1] which represents an ICE attacking dealing damage to a NORMAL typed pokemon.
+	# See the battles/arrays/type_matchups.cfg along with battles/arrays/type_value_key for the values.
+	damageMultiplierOne="${moveTypeofAttack}[${typeValueKeyOne}]"
+	damageMultiplierTwo="${moveTypeofAttack}[${typeValueKeyTwo}]"
+	# The grand finale
+	typeDamageBonus=$( echo "scale=2;${!damageMultiplierOne} * ${!damageMultiplierTwo}" | bc )
+
+
+	# Uncomment for testing
+#	echo -e "The type of the attack is ${moveTypeofAttack}.\nThe defending pokemon has typeOne=${defenderTypeOne} and typeTwo=${defenderTypeTwo}. \nThe damage multiplier of a ${moveTypeofAttack} move vs ${defenderTypeOne} is ${!damageMultiplierOne}. The damage multiplier of a ${moveTypeofAttack} vs ${defenderTypeTwo} is ${!damageMultiplierTwo}.\nThe overall damage multiplier is ${typeDamageBonus}"
+}
+
+
+# This function modifies the HP in a given pokemon attribute file.
+# Note: Dealing damage means we have to supply this function with a negative HPMod integer.
+modify_HP_value(){
+
+
+	targetPokemon="$1"
+	# Can be +ve or -ve
+	HPMod="$2"
+
+	read_attribute_battleFile "${battle_filetmp_path}/${1}.pokemon"
+	currentHP_forTesting=$currentHP
+	currentHP=$( expr $currentHP + $HPMod )
+
+	# Don't let currentHP drop under 0 or go over the maximum (maximum HP is $HP)
+	if [ $currentHP -lt 0 ]; then
+		currentHP=0
+	elif [ $currentHP -gt $HP ]; then
+		currentHP=$HP
+	fi
+
+	# Empty the target attribute battle file
+	> "${battle_filetmp_path}/${1}.pokemon"
+
+	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
+
+
+
+	echo "The Pokemon's HP was modified by ${HPMod}. The original HP value was ${currentHP_forTesting}. The current HP is now ${currentHP}."
+}
+
+
+
+#TODO
+# We should have a seperate function that actually changes the HP value in the defending pokemon's attribute file.
+# That function can be called by deal_damage. 
 deal_damage(){
 
 	attackingPokemon="$1"
 	defendingPokemon="$2"
+	attackBeingUsed="$3"
+	# This value is always hardcoded into the move. This argument CAN be empty.
+	critRateMultiplier="$4"
 
 	# Get values from attacking pokemon
-	read_attribute_battleFile "${battle_filetmp_path}/${1}"
+	read_attribute_battleFile "${battle_filetmp_path}/${1}.pokemon"
 	levelAttacker=$level
 	attackAttacker=$attack
-	attackTypeOne=$typeOne
-	attackTypeTwo=$typeTwo
+	# Used for STAB calculation.
+	attackerTypeOne=$typeOne
+	attackerTypeTwo=$typeTwo
 	#TODO At this stage we need to read the moves file in order to extract:
 	# Type of the move
 	# Base power of the move
 
+	read_moves_file "$attackBeingUsed"
+	# Gives us 1) Type of move = $moveType
+	# Gives us 2) Power of move = movePower
+	# Warning: This function is invoked in calculate_STAB, calculate_type_damage_bonus too.
+	# We're reading the line for the same move each time (and hence $moveType and $movePower will be 'updated', but just be aware of this. As long as we don't read the line for another move from here until the damage calculation we should be okay.
+	# We might not even need the read_moves_file invocation here, but by being here it makes everything more readable.
+
+	#--- Calculate Modifiers ---#
+
+	# Gives us $STAB
+	calculate_STAB "$attackBeingUsed" "$attackerTypeOne" "$attackerTypeTwo"
+	# Next, invoke calculate_type_damage_bonus
+	# It gives us $typeDamageBonus
+	#TODO We need to read the defending pokemon's Attribute file to extract their typeOne and typeTwo for arguments
+	read_attribute_battleFile "${battle_filetmp_path}/${2}.pokemon"
+	defenderTypeOne="$typeOne"
+	defenderTypeTwo="$typeTwo"
+	defenderDefense="$defense"
+	calculate_type_damage_bonus "$attackBeingUsed" "$defenderTypeOne" "$defenderTypeTwo"
+	
+	# Generate a random number between 0.85 and 1
+	randomDamageMultiplier=$( shuf -i 85-100 | head -1 )
+	randomDamageMultiplier=$( echo "scale=2;${randomDamageMultiplier}/100" | bc )
+
+	#--- The damage calculation ---#
+	damageToDeal=$( echo "scale=4;( ( ( ( ( 2*${levelAttacker}+10 )/250 )*( ${attackAttacker}/${defenderDefense} )*( ${movePower} ) + 2 ) + 2 )*( ${STAB}*${typeDamageBonus}*${randomDamageMultiplier} ) )" | bc )
+	# Divide it by -1 to get negative value (for use in the HP modification function)
+	# Since there's no 'scale=X' it rounds the number down to the nearest integer
+	damageToDeal=$( echo "${damageToDeal}/-1" | bc )
+
+	# Uncomment for testing
+#	echo -e "\nLevel of attacker: ${levelAttacker}\nAttack of attacker: ${attackAttacker}\nDefense of defender: ${defenderDefense}\nBase power of move: ${movePower}\n\n===MODIFIERS===\n\nSTAB: ${STAB}\nType damage bonus: ${typeDamageBonus}\nThe random value: ${randomDamageMultiplier}\nThe total damage dealt by the ${moveName} attack: ${damageToDeal}\n\nNOTE: CRIT IS CALCULATED OUTSIDE OF THE DAMAGE FUNCTION so it's not present here.\n"
 }
 
+
+# Example function calls for testing
+
+#generate_attribute_battleFile "$PCPokemonFile" 1093.001
 #deal_damage 'NPCPokemon.pokemon'
+#read_moves_file 77
+#calculate_STAB 15 "NORMAL" "POISON"
+#calculate_type_damage_bonus 15 ROCK DRAGON
+#read_base_stats 001
+#calculate_crit_bonus 001 PCPokemon
+#read_base_stats 001
+#modify_HP_value PCPokemon 100
+#deal_damage PCPokemon NPCPokemon 33 1

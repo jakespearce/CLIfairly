@@ -24,7 +24,7 @@ generate_attribute_battleFile(){
 	read_pokemon_file "$targetPokemon"
 	[[ ! -e "$fileToGenerate" ]] && touch "$fileToGenerate"
 	# Note: We may use the code below elsewhere so this may become its own function one day.
-	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t0\t0\t0\t0\t0" >> "$fileToGenerate"
+	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t0\t0\t0\t0\t0\t0\t0\t0\t0" >> "$fileToGenerate"
 }
 
 
@@ -36,7 +36,7 @@ read_attribute_battleFile(){
 	IFS_OLD=$IFS
 	IFS='	' #tab
 
-	while read pokemonID_ pokemonUniqueID_ pokemonName_ level_ HP_ currentHP_ attack_base_ defense_base_ special_base_ speed_base_ attack_stage_ defense_stage_ special_stage_ speed_stage_ attack_ defense_ special_ speed_ accuracy_ evasion_ crit_multiplier_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMax_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ majorAilment_ confusion_ trapped_ seeded_ substituted_ flinch_; do
+	while read pokemonID_ pokemonUniqueID_ pokemonName_ level_ HP_ currentHP_ attack_base_ defense_base_ special_base_ speed_base_ attack_stage_ defense_stage_ special_stage_ speed_stage_ attack_ defense_ special_ speed_ accuracy_ evasion_ crit_multiplier_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMax_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ majorAilment_ confusion_ trapped_ seeded_ substituted_ flinch_ semiInvulnerable_ mist_ lightScreen_ reflect_; do
 		pokemonID="$pokemonID_"
 		pokemonUniqueID=$pokemonUniqueID_
 		pokemonName=$pokemonName_
@@ -78,6 +78,10 @@ read_attribute_battleFile(){
 		seeded=$seeded_
 		substituted=$substituted_
 		flinch=$flinch_
+		semiInvulnerable=$semiInvulnerable_
+		mist=$mist_
+		lightScreen=$lightScreen_
+		reflect=$reflect_
 
 	done < "$fileToRead"
 
@@ -92,7 +96,7 @@ read_moves_file(){
 	moveToRead="$1"
 	IFS_OLD=$IFS
 	IFS='	' # TAB
-	while read moveID_ moveName_ moveMachineType_ moveppMax_ moveType_ moveAccuracy_ movePower_; do
+	while read moveID_ moveName_ moveMachineType_ moveppMax_ moveType_ moveAccuracy_ movePower_ moveCategory_; do
 
 		if [ "$moveID_" = "$moveToRead" ]; then
 			moveID="$moveID_"
@@ -102,6 +106,7 @@ read_moves_file(){
 			moveType="$moveType_"
 			moveAccuracy="$moveAccuracy_"
 			movePower="$movePower_"
+			moveCategory="$moveCategory_"
 
 		fi
 
@@ -288,7 +293,7 @@ modify_HP_value(){
 	# Can be +ve or -ve
 	HPMod="$2"
 
-	read_attribute_battleFile "${battle_filetmp_path}/${1}.pokemon"
+	read_attribute_battleFile "${battle_filetmp_path}/${targetPokemon}.pokemon"
 	currentHP_forTesting=$currentHP
 	currentHP=$( expr $currentHP + $HPMod )
 
@@ -300,9 +305,9 @@ modify_HP_value(){
 	fi
 
 	# Empty the target attribute battle file
-	> "${battle_filetmp_path}/${1}.pokemon"
+#	> "${battle_filetmp_path}/${targetPokemon}.pokemon"
 
-	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
+#	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
 
 
 
@@ -314,6 +319,7 @@ modify_HP_value(){
 #TODO
 # We should have a seperate function that actually changes the HP value in the defending pokemon's attribute file.
 # That function can be called by deal_damage. 
+
 deal_damage(){
 
 	attackingPokemon="$1"
@@ -322,23 +328,30 @@ deal_damage(){
 	# This value is always hardcoded into the move. This argument CAN be empty.
 	critRateMultiplier="$4"
 
+	read_moves_file "$attackBeingUsed"
+	# Gives us 1) Type of move = $moveType
+	# Gives us 2) Power of move = $movePower
+	# Gives us 3) Category of mvoe = $moveCategory
+	# Warning: This function is invoked in calculate_STAB, calculate_type_damage_bonus too.
+	# We're reading the line for the same move each time (and hence $moveType and $movePower will be 'updated', but just be aware of this. As long as we don't read the line for another move from here until the damage calculation we should be okay.
+
 	# Get values from attacking pokemon
-	read_attribute_battleFile "${battle_filetmp_path}/${1}.pokemon"
+	read_attribute_battleFile "${battle_filetmp_path}/${attackingPokemon}.pokemon"
 	levelAttacker=$level
-	attackAttacker=$attack
+	# Categories are: PHYSICAL, SPECIAL, STATUS. Note that STATUS moves don't use the damage formula.
+	if [ "$moveCategory" = "PHYSICAL" ]; then
+		attackAttacker=$attack
+
+		if [ "$majorAilment" == "BRN" ]; then
+			attackAttacker=$(( $attackAttacker / 2 ))
+		fi
+
+	else
+		attackAttacker=$special
+	fi
 	# Used for STAB calculation.
 	attackerTypeOne=$typeOne
 	attackerTypeTwo=$typeTwo
-	#TODO At this stage we need to read the moves file in order to extract:
-	# Type of the move
-	# Base power of the move
-
-	read_moves_file "$attackBeingUsed"
-	# Gives us 1) Type of move = $moveType
-	# Gives us 2) Power of move = movePower
-	# Warning: This function is invoked in calculate_STAB, calculate_type_damage_bonus too.
-	# We're reading the line for the same move each time (and hence $moveType and $movePower will be 'updated', but just be aware of this. As long as we don't read the line for another move from here until the damage calculation we should be okay.
-	# We might not even need the read_moves_file invocation here, but by being here it makes everything more readable.
 
 	#--- Calculate Modifiers ---#
 
@@ -347,10 +360,30 @@ deal_damage(){
 	# Next, invoke calculate_type_damage_bonus
 	# It gives us $typeDamageBonus
 	#TODO We need to read the defending pokemon's Attribute file to extract their typeOne and typeTwo for arguments
-	read_attribute_battleFile "${battle_filetmp_path}/${2}.pokemon"
+	read_attribute_battleFile "${battle_filetmp_path}/${defendingPokemon}.pokemon"
 	defenderTypeOne="$typeOne"
 	defenderTypeTwo="$typeTwo"
-	defenderDefense="$defense"
+	if [ "$moveCategory" = "PHYSICAL" ]; then
+		defenderDefense=$defense
+
+		if [ $reflect -eq 1 ]; then
+			defenderDefense=$(( $defenderDefense * 2 ))
+		fi
+
+	else
+		defenderDefense=$special
+
+		if [ $lightScreen -eq 1 ]; then
+			defenderDefense=$(( $defenderDefense * 2 ))
+		fi
+
+	fi
+
+	# Hard-coding Self-Destruct and Explosion here. They're the only moves in the game that have this effect.
+	if [ "$attackBeingUsed" -eq 120 -o "$attackBeingUsed" -eq 153 ]; then
+		defenderDefense=$(( $defenderDefense / 2 ))
+	fi
+
 	calculate_type_damage_bonus "$attackBeingUsed" "$defenderTypeOne" "$defenderTypeTwo"
 	
 	# Generate a random number between 0.85 and 1
@@ -364,13 +397,16 @@ deal_damage(){
 	damageToDeal=$( echo "${damageToDeal}/-1" | bc )
 
 	# Uncomment for testing
-#	echo -e "\nLevel of attacker: ${levelAttacker}\nAttack of attacker: ${attackAttacker}\nDefense of defender: ${defenderDefense}\nBase power of move: ${movePower}\n\n===MODIFIERS===\n\nSTAB: ${STAB}\nType damage bonus: ${typeDamageBonus}\nThe random value: ${randomDamageMultiplier}\nThe total damage dealt by the ${moveName} attack: ${damageToDeal}\n\nNOTE: CRIT IS CALCULATED OUTSIDE OF THE DAMAGE FUNCTION so it's not present here.\n"
+	echo -e "\nLevel of attacker: ${levelAttacker}\nAttack of attacker: ${attackAttacker} (${moveCategory} - Category)\nDefense of defender: ${defenderDefense}\nBase power of move: ${movePower}\n\n===MODIFIERS===\n\nSTAB: ${STAB}\nType damage bonus: ${typeDamageBonus}\nThe random value: ${randomDamageMultiplier}\nThe total damage dealt by the ${moveName} attack: ${damageToDeal}\n\nNOTE: CRIT IS CALCULATED OUTSIDE OF THE DAMAGE FUNCTION so it's not present here.\n"
+
+	modify_HP_value "$defendingPokemon" "$damageToDeal"
+
 }
 
 
 # Example function calls for testing
 
-#generate_attribute_battleFile "$PCPokemonFile" 1093.001
+#generate_attribute_battleFile "$NPCPokemonFile" 1092.001
 #deal_damage 'NPCPokemon.pokemon'
 #read_moves_file 77
 #calculate_STAB 15 "NORMAL" "POISON"
@@ -379,4 +415,4 @@ deal_damage(){
 #calculate_crit_bonus 001 PCPokemon
 #read_base_stats 001
 #modify_HP_value PCPokemon 100
-#deal_damage PCPokemon NPCPokemon 33 1
+deal_damage PCPokemon NPCPokemon 33 1

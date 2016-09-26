@@ -162,7 +162,7 @@ IFS_OLD=$IFS
 # IFS = tab
 IFS="	"
 # don't get PP from here. Remember PP can be increased at the pokemon level. Getting moveOnePPMax from here is a hack. For some absolutely freaky reason, moveOnePPMax can't be read from the pokemon file (see line 47). Everything else reads okay, just not this one value in particular. Fuck knows. Getting any other value from that file is fine.
-while read moveID moveName HM_TM defaultPP moveType accuracy power; do
+while read moveID moveName HM_TM defaultPP moveType accuracy power category; do
 	case $moveID in
 	"$moveOne") moveOneName="$moveName" && moveOnePPMax="$defaultPP" ;;
 	"$moveTwo") moveTwoName="$moveName" ;;
@@ -170,6 +170,7 @@ while read moveID moveName HM_TM defaultPP moveType accuracy power; do
 	"$moveFour") moveFourName="$moveName" ;;
 	esac
 done < "$moves_tab_file"
+IFS=$IFS_OLD
 
 #blockFive
 touch "$blockFive"

@@ -11,6 +11,7 @@ base_stats_path="${HOME}/pokemon/gui/pokemon_database/base_stats/"
 
 source "$type_matchups_array"
 source "${HOME}/pokemon/gui/tools/tools.sh"
+source "${HOME}/pokemon/gui/battles/arrays/stat_stages.cfg"
 
 
 # This function generates the "battleFile" for a pokemon (a .tab file which stores its in-battle stats)
@@ -151,6 +152,52 @@ read_base_stats(){
 	    baseExpYield=$baseExpYield_
 	done < "${base_stats_path}${targetPokemonSpeciesID}.stats"
 	IFS=$IFS_OLD
+}
+
+
+# Determines whether the move hits or not.
+# attacking and defending Pokemon parameters aare "PCPokemon.pokemon" or "NPCPokemon.pokemon"
+# attackBeingUsed is a number representing the moveID of the move being used.
+accuracy_check(){
+
+	local attackingPokemon="$1"
+	local defendingPokemon="$2"
+	local attackBeingUsed="$3"
+
+	read_attribute_battleFile "${battle_filetmp_path}/${defendingPokemon}.pokemon"
+	# If the pokemon is semi-invulnerable then the move just doesn't hit
+	if [ $semiInvulnerable -eq 1 ]; then
+		doesTheMoveHit="no"
+		return 0
+	fi
+
+	local defenderEvasion="$evasion"
+	local evasionValue="EVASIONSTAGE[${evasion}]"
+	local evasionValue=${!evasionValue}
+
+	read_attribute_battleFile "${battle_filetmp_path}/${attackingPokemon}.pokemon"
+	local attackerAccuracy="$accuracy"
+	local accuracyValue="ACCURACYSTAGE[${attackerAccuracy}]"
+	local accuracyValue=${!accuracyValue}
+
+	read_moves_file "$attackBeingUsed"
+	local accuracyMove="$moveAccuracy"
+
+	local probabilityToHit=$( echo "scale=3;${accuracyMove}*(${accuracyValue}/${evasionValue})" | bc )
+	local probabilityToHit=$(echo "${probabilityToHit}/1" | bc)
+	local randomValue=$( shuf -i 1-100 | head -1 )
+
+	if [ $probabilityToHit -gt $randomValue ]; then
+		# The move hits
+		doesTheMoveHit="yes"
+	else
+		doesTheMoveHit="no"
+	fi
+
+	# Uncomment for testing
+
+#	echo -e "The evasionValue for the defending pokemon is ${evasionValue}.\nThe accuracy value for the defending pokemon is ${accuracyValue}.\nThe accuracy of the move being used is ${accuracyMove}.\nThe probability for the move to hit is ${probabilityToHit}.\n\nIf the randomValue, which is a value between 1-100, falls within the range of the probabilityToHit, then the move is a hit.\nThe randomValue is: ${randomValue}.\n\nDoes the move hit? ${doesTheMoveHit}."
+	
 }
 
 
@@ -415,4 +462,6 @@ deal_damage(){
 #calculate_crit_bonus 001 PCPokemon
 #read_base_stats 001
 #modify_HP_value PCPokemon 100
-deal_damage PCPokemon NPCPokemon 33 1
+#deal_damage PCPokemon NPCPokemon 33 1
+#accuracy_check "PCPokemon" "NPCPokemon" 79
+

@@ -196,9 +196,76 @@ accuracy_check(){
 
 	# Uncomment for testing
 
-#	echo -e "The evasionValue for the defending pokemon is ${evasionValue}.\nThe accuracy value for the defending pokemon is ${accuracyValue}.\nThe accuracy of the move being used is ${accuracyMove}.\nThe probability for the move to hit is ${probabilityToHit}.\n\nIf the randomValue, which is a value between 1-100, falls within the range of the probabilityToHit, then the move is a hit.\nThe randomValue is: ${randomValue}.\n\nDoes the move hit? ${doesTheMoveHit}."
+	echo -e "\n\n==ACCURACY CHECK==\n\nThe evasionValue for the defending pokemon is ${evasionValue}.\nThe accuracy value for the defending pokemon is ${accuracyValue}.\nThe accuracy of the move being used is ${accuracyMove}.\nThe probability for the move to hit is ${probabilityToHit} (\$probabilityToHit).\n\nIf the randomValue, which is a value between 1-100, falls within the range of the probabilityToHit, then the move is a hit.\nThe randomValue is: ${randomValue}.\nDoes the move hit? ${doesTheMoveHit}.\n"
 	
 }
+
+
+# Checks to see if modifying a stat stage by a given amount raises the stage > 12 or < 0. 
+# If either of these is true then we need to inform the parent script by setting the fail variable. 
+# Eg. if $fail == "true" then display the text "But it failed!"
+statStageModCheck(){
+
+	targetPokemon="$1"
+	attributeToModify="$2"
+	modifierValue="$3"
+	# Set $fail up here otherwise it won't be set if it's false
+	fail="false"
+
+	read_attribute_battleFile "${battle_filetmp_path}/${targetPokemon}.pokemon"
+
+	case $attributeToModify in
+		attack) attack_stage=$(( $attack_stage + $modifierValue )) ; if [ $attack_stage -gt 12 -o $attack_stage -lt 0 ]; then fail="true"; fi ;;
+		defense) defense_stage=$(( $defense_stage + $modifierValue )) ; if [ $defense_stage -gt 12 -o $defense_stage -lt 0 ]; then fail="true"; fi ;;
+		special) special_stage=$(( $special_stage + $modifierValue ))  ; if [ $special_stage -gt 12 -o $special_stage -lt 0 ]; then fail="true"; fi ;;
+		speed) speed_stage=$(( $speed_stage + $modifierValue ))  ; if [ $speed_stage -gt 12 -o $speed_stage -lt 0 ]; then fail="true"; fi ;;
+		accuracy) accuracy=$(( $accuracy + $modifierValue ))  ; if [ $accuracy -gt 12 -o $accuracy -lt 0 ]; then fail="true"; fi ;;
+		evasion) evasion=$(( $evasion + $modifierValue)) ; if [ $evasion -gt 12 -o $evasion -lt 0 ]; then fail="true"; fi  ;;
+	esac
+
+	# Uncomment for testing
+	echo "fail is ${fail}."
+
+}
+
+
+# Takes an attribute parameter (eg. attack, evasion) and a value parameter (+/- 1 to 9)
+# Modifies specified attribute by value for target pokemon
+# All this function does is modify an attribute, no checks to see if that attribute is lt 0 or gt 12 take place here.
+modifyAttributeByStage(){
+
+	targetPokemon="$1"
+	attributeToModify="$2"
+	modifierValue="$3"
+
+
+	read_attribute_battleFile "${battle_filetmp_path}/${targetPokemon}.pokemon"
+
+	# The following block is for testing purposes
+	attack_stageOLD="$attack_stage"
+	defense_stageOLD="$defense_stage"
+	special_stageOLD="$special_stage"
+	speed_stageOLD="$speed_stage"
+	accuracyOLD="$accuracy"
+	evasionOLD="$evasion"
+	# /testing purposes block
+
+	case $attributeToModify in
+		attack) attack_stage=$(( $attack_stage + $modifierValue )) ;;
+		defense) defense_stage=$(( $defense_stage + $modifierValue )) ;;
+		special) special_stage=$(( $special_stage + $modifierValue )) ;;
+		speed) speed_stage=$(( $speed_stage + $modifierValue )) ;;
+		accuracy) accuracy=$(( $accuracy + $modifierValue )) ;;
+		evasion) evasion=$(( $evasion + $modifierValue)) ;;
+	esac
+
+#	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
+
+
+	# Uncomment for testing
+	echo -e "The attributeToModify is ${attributeToModify}.\nThe modifierValue is ${modifierValue}.\nThe old values are: attack=${attack_stageOLD}  defense=${defense_stageOLD}  special=${special_stageOLD}  speed=${speed_stageOLD} accuracy=${accuracyOLD}  evasion=${evasionOLD}.\nThe new values are: attack=${attack_stage}  defense=${defense_stage}  special=${special_stage}  speed=${speed_stage} accuracy=${accuracy}  evasion=${evasion}.\n"
+}
+
 
 
 #---- FUNCTIONS THAT CALCULATE MODIFIER VALUES ----#
@@ -244,7 +311,7 @@ calculate_crit_bonus(){
 
 	# Uncomment for testing
 
-#	echo -e "The critRateMultiplier (supplied by the move script) is ${critRateMultiplier}.\nThe critMultiplierAttribute, the crit value from the pokemon's attribute file, is ${critMultiplierAttribute}.\nThe base speed of the attacking pokemon is ${baseSpeed}.\nThe critRate, ${critRate}, needs to exceed ${randomValue} in order to be a crit.\nThe criticalModifier (1 = no crit, 2 = crit) is ${criticalModifier}."
+	echo -e "\n\n==CALCULATE CRIT BONUS==\n\nThe critRateMultiplier (supplied by the move script) is ${critRateMultiplier}.\nThe critMultiplierAttribute, the crit value from the pokemon's attribute file, is ${critMultiplierAttribute}.\nThe base speed of the attacking pokemon is ${baseSpeed}.\nThe critRate, ${critRate}, needs to exceed ${randomValue} in order to be a crit.\nThe criticalModifier (1 = no crit, 2 = crit) is ${criticalModifier}.\n"
 
 #	echo $pokemonSpeciesID
 #	echo $critRateMultiplier
@@ -372,7 +439,7 @@ deal_damage(){
 	attackingPokemon="$1"
 	defendingPokemon="$2"
 	attackBeingUsed="$3"
-	# This value is always hardcoded into the move. This argument CAN be empty.
+	# This value comes from calculate_crit_bonus
 	critRateMultiplier="$4"
 
 	read_moves_file "$attackBeingUsed"
@@ -438,13 +505,13 @@ deal_damage(){
 	randomDamageMultiplier=$( echo "scale=2;${randomDamageMultiplier}/100" | bc )
 
 	#--- The damage calculation ---#
-	damageToDeal=$( echo "scale=4;( ( ( ( ( 2*${levelAttacker}+10 )/250 )*( ${attackAttacker}/${defenderDefense} )*( ${movePower} ) + 2 ) + 2 )*( ${STAB}*${typeDamageBonus}*${randomDamageMultiplier} ) )" | bc )
+	damageToDeal=$( echo "scale=4;( ( ( ( ( 2*${levelAttacker}+10 )/250 )*( ${attackAttacker}/${defenderDefense} )*( ${movePower} ) + 2 ) + 2 )*( ${STAB}*${typeDamageBonus}*${critRateMultiplier}*${randomDamageMultiplier} ) )" | bc )
 	# Divide it by -1 to get negative value (for use in the HP modification function)
 	# Since there's no 'scale=X' it rounds the number down to the nearest integer
 	damageToDeal=$( echo "${damageToDeal}/-1" | bc )
 
 	# Uncomment for testing
-	echo -e "\nLevel of attacker: ${levelAttacker}\nAttack of attacker: ${attackAttacker} (${moveCategory} - Category)\nDefense of defender: ${defenderDefense}\nBase power of move: ${movePower}\n\n===MODIFIERS===\n\nSTAB: ${STAB}\nType damage bonus: ${typeDamageBonus}\nThe random value: ${randomDamageMultiplier}\nThe total damage dealt by the ${moveName} attack: ${damageToDeal}\n\nNOTE: CRIT IS CALCULATED OUTSIDE OF THE DAMAGE FUNCTION so it's not present here.\n"
+	echo -e "\n==DAMAGE CALCULATION==\n\nLevel of attacker: ${levelAttacker}\nAttack of attacker: ${attackAttacker} (${moveCategory} - Category)\nDefense of defender: ${defenderDefense}\nAttack being used: ${moveName} (ID = ${moveID})\nBase power of move: ${movePower}\n\nMODIFIERS\n\nSTAB: ${STAB}\nType damage bonus: ${typeDamageBonus}\nThe random value: ${randomDamageMultiplier}\nThe total damage dealt by the ${moveName} attack: ${damageToDeal}\n\n"
 
 	modify_HP_value "$defendingPokemon" "$damageToDeal"
 
@@ -464,4 +531,6 @@ deal_damage(){
 #modify_HP_value PCPokemon 100
 #deal_damage PCPokemon NPCPokemon 33 1
 #accuracy_check "PCPokemon" "NPCPokemon" 79
+#modifyAttributeByStage 'NPCPokemon' 'accuracy' 7
+#statStageModCheck 'NPCPokemon' 'evasion' 4
 

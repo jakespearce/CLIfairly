@@ -5,9 +5,11 @@ battle_filetmp_path="${HOME}/pokemon/gui/battles/tmp_files"
 PCPokemonFile="${battle_filetmp_path}/PCPokemon.pokemon"
 NPCPokemonFile="${battle_filetmp_path}/NPCPokemon.pokemon"
 moves_file="${HOME}/pokemon/gui/pokemon_database/common/moves/moves.tab"
+moves_script_path="${HOME}/pokemon/gui/pokemon_database/common/moves/move_scripts"
 type_value_key="${HOME}/pokemon/gui/tools/type_value_key_lookup.tab"
 type_matchups_array="${HOME}/pokemon/gui/battles/arrays/type_matchups.cfg"
 base_stats_path="${HOME}/pokemon/gui/pokemon_database/base_stats/"
+actionStackFile="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tab"
 
 source "$type_matchups_array"
 source "${HOME}/pokemon/gui/tools/tools.sh"
@@ -425,7 +427,7 @@ modify_HP_value(){
 
 
 
-	echo "The Pokemon's HP was modified by ${HPMod}. The original HP value was ${currentHP_forTesting}. The current HP is now ${currentHP}."
+	echo -e "The Pokemon's HP was modified by ${HPMod}. The original HP value was ${currentHP_forTesting}. The current HP is now ${currentHP}.\n\n"
 }
 
 
@@ -518,6 +520,60 @@ deal_damage(){
 }
 
 
+#---- FUNCTIONS THAT DEAL WITH TIMING/THE STACK----#
+# the stack is a cool term that i appropriated from magic the gathering
+
+# This function reads the actionStack.tab file 
+# It extracts variables from the values written to that file.
+read_actionStack(){
+
+	IFS_OLD=$IFS
+	IFS='	' #tab
+	while read actionID priority scriptVariable playerID; do
+		if [ "$playerID" == "PC" ]; then
+			PCaction="$actionID"
+			PCpriority="$priority"
+			PCscriptVariable="$scriptVariable"
+		elif [ "$playerID" == "NPC" ]; then
+			NPCaction="$actionID"
+			NPCpriority="$priority"
+			NPCscriptVariable="$scriptVariable"
+		fi
+	done < "$actionStackFile"
+	IFS=$IFS_OLD
+
+
+	echo -e "PCaction is ${PCaction}, PCpriority is ${PCpriority}.\nNPCaction is ${NPCaction}. NPC priority is ${NPCpriority}."
+}
+
+
+# This function executes things described in the actionStack for a given player
+# Not sure where we'll get the $playerID argument from yet, probably somewhere else
+#TODO So far we only have ways of executing attacks. We'll eventually need to add item usage and running.
+#execute_action "PC" "$PCaction" "$PCscriptVariable"
+execute_action(){
+
+	local playerID="$1"
+	local actionID="$2"
+	local scriptVariable="$3"
+
+	# First, the case that the action is to attack
+	if [ "$actionID" -eq 1 ]; then
+
+		if [ "$playerID" == "PC" ]; then
+			attackingPokemon="PCPokemon"
+			defendingPokemon="NPCPokemon"
+		else
+			attackingPokemon="NPCPokemon"
+			defendingPokemon="PCPokemon"
+		fi	
+
+	bash "${moves_script_path}/${scriptVariable}.sh" "$attackingPokemon" "$defendingPokemon"
+
+	fi
+}
+
+
 # Example function calls for testing
 
 #generate_attribute_battleFile "$NPCPokemonFile" 1092.001
@@ -533,4 +589,5 @@ deal_damage(){
 #accuracy_check "PCPokemon" "NPCPokemon" 79
 #modifyAttributeByStage 'NPCPokemon' 'accuracy' 7
 #statStageModCheck 'NPCPokemon' 'evasion' 4
-
+#read_actionStack Warning - causes infinite loop
+#execute_action "PC" "$PCaction" "$PCscriptVariable" - Warning - causes infinite loop

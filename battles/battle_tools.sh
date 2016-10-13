@@ -520,6 +520,119 @@ deal_damage(){
 }
 
 
+
+#---- "CHECK" FUNCTIONS ----#
+# Eg. Check if the Pokemon has died
+
+#- Functions that run checks before the attack phase-#
+
+# Checks for ailments and decides whether a pokemon can attack this turn
+# Eg. Pokemon is Frozen, therefore it can't attack
+# Parameters: pokemonToCheck, attackUsed
+# pre_attack_status_checks NPCPokemon 44
+
+pre_attack_status_checks(){
+
+	pokemonToCheck="$1"
+	# Used for the disable check. If attack used = D then that move is disabled
+	attackUsed="$2"
+
+	read_attribute_battleFile "${battle_filetmp_path}/${pokemonToCheck}.pokemon"
+	# variables extracted via this function that we care about:
+	# flinch, majorAilment, trapped, move{One,Two,Three,Four}PPMax (to check for the D which stands for disabled)
+	# confusion, TODO obedience
+
+	# The order in which we check for attributes is important
+	# Eg. Sleep needs to be checked first as this overrides everything else
+
+	#TODO Sleep could also be handled in the ClockFile, but we'll have it here for testing
+	#TODO It's possible for a pokemon to be confused AND paralysed. So far we ignore paralysis if the pokemon is confused.
+	if [ "$majorAilment" == "SLP" ]; then
+		set_skip_attack_and_cause "SLP"
+		return 0
+	elif [ "$majorAilment" == "FRZ"  ]; then
+		set_skip_attack_and_cause "FRZ"
+		return 0
+	elif [ "$trapped" == 1 ]; then
+		set_skip_attack_and_cause "trapped"
+		return 0
+	elif [ "$attackUsed" == "D" ]; then
+		set_skip_attack_and_cause "disabled"
+		return 0
+	elif [ "$confusion" == 1 ]; then
+		set_skip_attack_and_cause "confused"
+		return 0
+	elif [ "$majorAilment" == "PAR" ]; then
+		set_skip_attack_and_cause "PAR"
+		return 0
+	fi
+
+	# Uncomment for testing - Note: Include this OUTSIDE of the function.
+	# echo "The value for skip_attack = ${skip_attack}. The reason for this is: ${skip_attack_cause}."
+}
+# Used by pre_attack_status_checks function
+set_skip_attack_and_cause(){
+
+	skip_attack=1
+	skip_attack_cause="$1"
+}
+
+
+#- Functions that 'check' after the attack phase -#
+
+
+# Checks if the active pokemon (the pokemon whos turn it is) is poisoned, and if they are, damages them
+# Parameters: pokemonToCheck (eg. NPCPokemon)
+poison_check(){
+
+	pokemonToCheck="$1"
+	read_attribute_battleFile "${battle_filetmp_path}/${pokemonToCheck}.pokemon"
+
+	if [ "$majorAilment" == "PSN" ]; then
+		poisonDamage=$( echo "scale=0;(${HP}/16)*(-1)" | bc )
+		modify_HP_value "$pokemonToCheck" "$poisonDamage"
+	fi
+}
+
+
+# Checks if the active pokemon (the pokemon whos turn it is) is burned, and if they are, damages them
+# Parameters: pokemonToCheck (eg. NPCPokemon)
+burn_check(){
+
+	pokemonToCheck="$1"
+	read_attribute_battleFile "${battle_filetmp_path}/${pokemonToCheck}.pokemon"
+
+	if [ "$majorAilment" == "BRN" ]; then
+		burnDamage=$( echo "scale=0;(${HP}/16)*(-1)" | bc )
+		modify_HP_value "$pokemonToCheck" "$burnDamage"
+	fi
+}
+
+
+# Checks if the active pokemon (the pokemon whos turn it is) is seeded, and if they are, damages them
+# and restores the damage to the opposing pokemon
+# Parameters: pokemonToCheck opposingPokemon
+leech_seed_check(){
+
+	pokemonToCheck="$1"
+	opposingPokemon="$2"
+	read_attribute_battleFile "${battle_filetmp_path}/${pokemonToCheck}.pokemon"
+
+	if [ "$seeded" == "1" ]; then
+		leechDamage=$( echo "scale=0;(${HP}/16)*(-1)" | bc )
+		# damage the pokemon who is seeded
+		modify_HP_value "$pokemonToCheck" "$leechDamage"
+		# heal the opposing pokemon
+		leechHeal=$( echo "scale=0;(${leechDamage})*(-1)" | bc )
+		modify_HP_value "$opposingPokemon" "$leechHeal"
+	fi
+
+	# Uncomment for testing
+	# echo "leechDamage = ${leechDamage}. leechHeal = ${leechHeal}." 
+}
+
+
+
 #---- FUNCTIONS THAT DEAL WITH TIMING/THE STACK----#
 # the stack is a cool term that i appropriated from magic the gathering
 
@@ -591,3 +704,7 @@ execute_action(){
 #statStageModCheck 'NPCPokemon' 'evasion' 4
 #read_actionStack Warning - causes infinite loop
 #execute_action "PC" "$PCaction" "$PCscriptVariable" - Warning - causes infinite loop
+#pre_attack_status_checks NPCPokemon 44 ; echo "The value for skip_attack = ${skip_attack}. The reason for this is: ${skip_attack_cause}."
+#poison_check NPCPokemon
+#burn_check NPCPokemon
+#leech_seed_check NPCPokemon PCPokemon

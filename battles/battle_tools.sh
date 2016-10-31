@@ -27,7 +27,7 @@ generate_attribute_battleFile(){
 	read_pokemon_file "$targetPokemon"
 	[[ ! -e "$fileToGenerate" ]] && touch "$fileToGenerate"
 	# Note: We may use the code below elsewhere so this may become its own function one day.
-	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t0\t0\t0\t0\t0\t0\t0\t0\t0" >> "$fileToGenerate"
+	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0" >> "$fileToGenerate"
 }
 
 
@@ -39,7 +39,7 @@ read_attribute_battleFile(){
 	IFS_OLD=$IFS
 	IFS='	' #tab
 
-	while read pokemonID_ pokemonUniqueID_ pokemonName_ level_ HP_ currentHP_ attack_base_ defense_base_ special_base_ speed_base_ attack_stage_ defense_stage_ special_stage_ speed_stage_ attack_ defense_ special_ speed_ accuracy_ evasion_ crit_multiplier_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMax_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ majorAilment_ confusion_ trapped_ seeded_ substituted_ flinch_ semiInvulnerable_ mist_ lightScreen_ reflect_; do
+	while read pokemonID_ pokemonUniqueID_ pokemonName_ level_ HP_ currentHP_ attack_base_ defense_base_ special_base_ speed_base_ attack_stage_ defense_stage_ special_stage_ speed_stage_ attack_ defense_ special_ speed_ accuracy_ evasion_ crit_multiplier_ typeOne_ typeTwo_ moveOne_ moveTwo_ moveThree_ moveFour_ moveOnePP_ moveTwoPP_ moveThreePP_ moveFourPP_ moveOnePPMax_ moveTwoPPMax_ moveThreePPMax_ moveFourPPMax_ majorAilment_ confusion_ trapped_ seeded_ substituted_ flinch_ semiInvulnerable_ mist_ lightScreen_ reflect_ sleepCounter_; do
 		pokemonID="$pokemonID_"
 		pokemonUniqueID=$pokemonUniqueID_
 		pokemonName=$pokemonName_
@@ -85,6 +85,7 @@ read_attribute_battleFile(){
 		mist=$mist_
 		lightScreen=$lightScreen_
 		reflect=$reflect_
+		sleepCounter=$sleepCounter_
 
 	done < "$fileToRead"
 
@@ -529,7 +530,7 @@ deal_damage(){
 # Checks for ailments and decides whether a pokemon can attack this turn
 # Eg. Pokemon is Frozen, therefore it can't attack
 # Parameters: pokemonToCheck, attackUsed
-# pre_attack_status_checks NPCPokemon 44
+#pre_attack_status_checks NPCPokemon 44
 
 pre_attack_status_checks(){
 
@@ -553,13 +554,14 @@ pre_attack_status_checks(){
 	elif [ "$majorAilment" == "FRZ"  ]; then
 		set_skip_attack_and_cause "FRZ"
 		return 0
+	# Maybe trapped should be a counter like confusion is?
 	elif [ "$trapped" == 1 ]; then
 		set_skip_attack_and_cause "trapped"
 		return 0
 	elif [ "$attackUsed" == "D" ]; then
 		set_skip_attack_and_cause "disabled"
 		return 0
-	elif [ "$confusion" == 1 ]; then
+	elif [ $confusion -ne 0 ]; then
 		set_skip_attack_and_cause "confused"
 		return 0
 	elif [ "$majorAilment" == "PAR" ]; then
@@ -660,6 +662,37 @@ read_actionStack(){
 }
 
 
+# Occurs between move ticks and the decision phase
+# Ticks down pokemon attributes: confusion, sleepCounter, reflect and lightScreen
+# NOTE: NEEDS TESTING.
+# TODO BREAKING CONFUSION AND SLEEP WILL REQUIRE GUI COMPONENTS MAYBE CREATE A VARIABLE OR WRITE TO SOMEWHERE
+# pokemon_attribute_tick "NPCPokemon"
+pokemon_attribute_tick(){
+
+	tickingPokemon="$1"
+	read_attribute_battleFile "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+	if [ $confusion -gt 0 ]; then
+		confusionValue=(( --confusion ))
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t0\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+	fi
+
+	if [ $sleepCounter -gt 0 ]; then
+		sleepCounterValue=(( --sleepCounter ))
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t0\t0\t${sleepCounterValue}" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+	fi
+
+	if [ $lightScreen -gt 0 ]; then
+		lightScreenValue=(( --lightScreen ))
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t${lightScreenValue}\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+	fi
+
+	if [ $lightScreen -gt 0 ]; then
+		lightScreenValue=(( --lightScreen ))
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t${lightScreenValue}\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+	fi
+
+}
+
 # This function executes things described in the actionStack for a given player
 # Not sure where we'll get the $playerID argument from yet, probably somewhere else
 #TODO So far we only have ways of executing attacks. We'll eventually need to add item usage and running.
@@ -689,7 +722,7 @@ execute_action(){
 
 # Example function calls for testing
 
-#generate_attribute_battleFile "$NPCPokemonFile" 1092.001
+#generate_attribute_battleFile "$PCPokemonFile" 1093.001
 #deal_damage 'NPCPokemon.pokemon'
 #read_moves_file 77
 #calculate_STAB 15 "NORMAL" "POISON"
@@ -708,3 +741,4 @@ execute_action(){
 #poison_check NPCPokemon
 #burn_check NPCPokemon
 #leech_seed_check NPCPokemon PCPokemon
+pokemon_attribute_tick "NPCPokemon"

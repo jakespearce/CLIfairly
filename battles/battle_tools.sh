@@ -14,7 +14,7 @@ actionStackFile="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tab"
 source "$type_matchups_array"
 source "${HOME}/pokemon/gui/tools/tools.sh"
 source "${HOME}/pokemon/gui/battles/arrays/stat_stages.cfg"
-
+source "${HOME}/pokemon/gui/battles/battle_gui.sh"
 
 # This function generates the "battleFile" for a pokemon (a .tab file which stores its in-battle stats)
 # First argument is the full path and name of the file to generate, second argument is the pokemonUniqueID of the pokemon we want to generate the battleFile for.
@@ -672,22 +672,22 @@ pokemon_attribute_tick(){
 	tickingPokemon="$1"
 	read_attribute_battleFile "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	if [ $confusion -gt 0 ]; then
-		confusionValue=(( --confusion ))
+		confusionValue=$(( --confusion ))
 		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t0\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
 	if [ $sleepCounter -gt 0 ]; then
-		sleepCounterValue=(( --sleepCounter ))
+		sleepCounterValue=$(( --sleepCounter ))
 		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t0\t0\t${sleepCounterValue}" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
 	if [ $lightScreen -gt 0 ]; then
-		lightScreenValue=(( --lightScreen ))
+		lightScreenValue=$(( --lightScreen ))
 		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t${lightScreenValue}\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
 	if [ $lightScreen -gt 0 ]; then
-		lightScreenValue=(( --lightScreen ))
+		lightScreenValue=$(( --lightScreen ))
 		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t${lightScreenValue}\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
@@ -741,4 +741,4 @@ execute_action(){
 #poison_check NPCPokemon
 #burn_check NPCPokemon
 #leech_seed_check NPCPokemon PCPokemon
-pokemon_attribute_tick "NPCPokemon"
+#pokemon_attribute_tick "NPCPokemon"

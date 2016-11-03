@@ -1,32 +1,29 @@
 #!/bin/bash
 
 # A test script to see to what extent gui components can be used in battle_tools.sh and the move scripts that battle_tools.sh calls
-
-art_path="${HOME}/pokemon/gui/pokemon_database/art/"
-
 #NOTE: functions in this script are being called from move.sh scripts and battle.sh
 
+#---- Path variables ----#
+
+art_path="${HOME}/pokemon/gui/pokemon_database/art/"
+battle_menu_move_info="/dev/shm/battle_menu_move_info"
+generated_move_menu="/dev/shm/generated_move_menu"
+generated_move_menu_marked="/dev/shm/generated_move_menu_marked"
+
+#---- Sources ----#
 # We source calculate_whitespace from here
 source "${HOME}/pokemon/gui/tools/tools.sh"
 
-# usage: pokemonToShow is the species name of the pokemon we need to display
-# We then use the species of this pokemon to display the correct art
-show_pokemon(){
 
-	cat "${art_path}${pokemonName}.art"
-}
+#---- Variables for the move list part of the menu ----#
 
-damage_text(){
+selection_adjuster=1
+where_selection_is=1
+hiOn=$( tput smso )
+hiOff=$( tput rmso )
 
-#	criticalModifier="$3"
-	# See if we can use a variable from the deal_damage function in here, somehow, too.
-	# If not, we may have to use this script in the deal_damage function itself, which is kinda annoying.
-	if [ $criticalModifier -eq 2 ]; then
-		echo "Critical hit!"
-	fi
-	echo "The pokemon with unique ID ${pokemonUniqueID} took  ${damageToDeal} damage!"
-}
 
+#---- Functions that deal with generating parts of the battle menu ----#
 
 # This function generates and displays a menu of the player's pokemon's moves
 # Two components: The backend component consisting of a tab file with the following fields:
@@ -74,20 +71,20 @@ generate_move_menu(){
 	if [ "$moveOneName_display" != "empty" ]; then
 		calculate_whitespace 20 ${#moveOneName_display} ' '
 		moveOneName_display="${moveOneName_display}${whitespace}"
-		echo "$moveOneName_display	$moveOneType_display	$moveOnePP_display	$moveOnePPMax	$moveOne" > generated_move_menu
+		echo "$moveOneName_display	$moveOneType_display	$moveOnePP_display	$moveOnePPMax	$moveOne" > "$generated_move_menu"
 	else
 		calculate_whitespace 20 1 ' '
-		echo "-	null	null	null	null" > generated_move_menu
+		echo "-${whitespace}	null	null	null	null" > "$generated_move_menu"
 
 	fi
 
 	if [ "$moveTwoName_display" != "empty" ]; then
 		calculate_whitespace 20 ${#moveTwoName_display} ' '
 		moveTwoName_display="${moveTwoName_display}${whitespace}"
-		echo "$moveTwoName_display	$moveTwoType_display	$moveTwoPP_display	$moveTwoPPMax	$moveTwo" >> generated_move_menu
+		echo "$moveTwoName_display	$moveTwoType_display	$moveTwoPP_display	$moveTwoPPMax	$moveTwo" >> "$generated_move_menu"
 	else
 		calculate_whitespace 20 1 ' '
-		echo "-	null	null	null	null" >> generated_move_menu
+		echo "-${whitespace}	null	null	null	null" >> "$generated_move_menu"
 
 	fi
 
@@ -97,7 +94,7 @@ generate_move_menu(){
 		echo "$moveThreeName_display	$moveThreeType_display	$moveThreePP_display	$moveThreePPMax	$moveThree" >> generated_move_menu
 	else
 		calculate_whitespace 20 1 ' '
-		echo "-	null	null	null	null" >> generated_move_menu
+		echo "-${whitespace}	null	null	null	null" >> "$generated_move_menu"
 
 
 	fi
@@ -105,10 +102,10 @@ generate_move_menu(){
 	if [ "$moveFourName_display" != "empty" ]; then
 		calculate_whitespace 20 ${#moveFourName_display} ' '
 		moveFourName_display="${moveThreeName_display}${whitespace}"
-		echo "$moveFourName_display	$moveFourType_display	$moveFourPP_display	$moveFourPPMax	$moveFour" >> generated_move_menu
+		echo "$moveFourName_display	$moveFourType_display	$moveFourPP_display	$moveFourPPMax	$moveFour" >> "$generated_move_menu"
 	else
 		calculate_whitespace 20 1 ' '
-		echo "-	null	null	null	null" >> generated_move_menu
+		echo "-${whitespace}	null	null	null	null" >> "$generated_move_menu"
 
 
 	fi
@@ -119,5 +116,52 @@ generate_move_menu(){
 #	echo "this is the name of move three with whitespace: ${moveThreeName_display}. "
 #	echo "this is the name of move four with whitespace: ${moveFourName_display}. "
 
+}
+
+
+# Displays information about the move to the right of the move list
+# Usage: generate_move_info_box $moveType $PP $PPMax
+# generate_move_info_box "Rock" 12 64
+generate_move_info_box(){
+
+	moveType_info="$1"
+	PP_info="$2"
+	PPMax_info="$3"
+
+	# usage: calculate_whitespace $whitespaceMax $string_length $whitespace_character
+	calculate_whitespace 10 ${#moveType_info} ' '
+	moveType_displayString="${moveType_info}${whitespace}"
+
+	PP_info_displayString="${PP_info}/${PPMax_info}"
+	calculate_whitespace 10 ${#PP_info_displayString} ' '
+	PP_info_displayString="${PP_info_displayString}${whitespace}"
+
+	echo "0-------------0" > "$battle_menu_move_info"
+	echo "|   Type/     |" >> "$battle_menu_move_info"
+	echo "|   ${moveType_displayString}|" >> "$battle_menu_move_info"
+	echo "|   ${PP_info_displayString}|" >> "$battle_menu_move_info"
+	# This needs 16 whitespace characters as when we paste it to $generated_move_menu_marked this line falls off the end
+	echo "                0-------------0" >> "$battle_menu_move_info"
 
 }
+
+# This doesn't show the menu for the user, it just marks the selected line as selected and writes it to generated_move_menu_marked
+refresh_menu(){
+
+	local count=0
+	OLD_IFS=$IFS
+	IFS='	' #tab
+
+	while read moveName_menu moveType_menu PP_menu PPMax_menu moveID_menu; do
+		((count++))
+		if [ $count -eq $where_selection_is ]; then
+			echo "> ${moveName_menu::-2}"
+		else
+			echo "${moveName_menu}"
+		fi
+	done < "$generated_move_menu" > "$generated_move_menu_marked"
+
+	IFS=$IFS_OLD
+}
+
+

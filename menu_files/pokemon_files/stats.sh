@@ -44,7 +44,7 @@ IFS=$IFS_OLD
 
 pokemonFileToRead="${owned_pokemon}/${selectedPokemon}.*"
 read_pokemon_file $pokemonFileToRead
-pokemon_Art="${pokemon_art_path}/${pokemonName}.art"
+pokemon_Art="${pokemon_art_path}/${pokemonID}.art"
 artLength="$( wc -L < "$pokemon_Art" )"
 
 # calculates the number of empty lines that should be on top of a given block so that the block sits level with the pokemon art. Only used for blockOne and blockSomethingIForgot

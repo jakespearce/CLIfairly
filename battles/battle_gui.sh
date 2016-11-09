@@ -5,7 +5,7 @@
 
 #---- Path variables ----#
 
-art_path="${HOME}/pokemon/gui/pokemon_database/art/"
+art_path="${HOME}/pokemon/gui/pokemon_database/art"
 battle_menu_move_info="/dev/shm/battle_menu_move_info"
 generated_move_menu="/dev/shm/generated_move_menu"
 generated_move_menu_marked="/dev/shm/generated_move_menu_marked"
@@ -91,7 +91,7 @@ generate_move_menu(){
 	if [ "$moveThreeName_display" != "empty" ]; then
 		calculate_whitespace 20 ${#moveThreeName_display} ' '
 		moveThreeName_display="${moveThreeName_display}${whitespace}"
-		echo "$moveThreeName_display	$moveThreeType_display	$moveThreePP_display	$moveThreePPMax	$moveThree" >> generated_move_menu
+		echo "$moveThreeName_display	$moveThreeType_display	$moveThreePP_display	$moveThreePPMax	$moveThree" >> "$generated_move_menu"
 	else
 		calculate_whitespace 20 1 ' '
 		echo "-${whitespace}	null	null	null	null" >> "$generated_move_menu"
@@ -124,9 +124,10 @@ generate_move_menu(){
 # generate_move_info_box "Rock" 12 64
 generate_move_info_box(){
 
-	moveType_info="$1"
-	PP_info="$2"
-	PPMax_info="$3"
+	read_generated_move_menu
+	moveType_info="$moveType_menu"
+	PP_info="$PP_menu"
+	PPMax_info="$PPMax_menu"
 
 	# usage: calculate_whitespace $whitespaceMax $string_length $whitespace_character
 	calculate_whitespace 10 ${#moveType_info} ' '
@@ -145,7 +146,8 @@ generate_move_info_box(){
 
 }
 
-# This doesn't show the menu for the user, it just marks the selected line as selected and writes it to generated_move_menu_marked
+
+# Doesn't show the menu for the user, it just marks the selected line as selected and writes it to generated_move_menu_marked
 refresh_menu(){
 
 	local count=0
@@ -165,3 +167,73 @@ refresh_menu(){
 }
 
 
+# Stops the selection from hitting null moves or going out of range
+keep_move_menu_selection_in_range(){
+
+	calculate_upper_limit_move_menu
+
+	if [ $where_selection_is -le 0 ]; then
+		where_selection_is=$(( $where_selection_is + 1 ))
+
+	elif [ $where_selection_is -ge 5 ]; then
+		where_selection_is=$(( $where_selection_is - 1 ))
+
+	elif [ $where_selection_is -ge $menu_upper_limit ]; then
+		where_selection_is=$(( $where_selection_is - 1 ))
+
+	fi
+
+}
+
+
+calculate_upper_limit_move_menu(){
+
+	local count=0
+	OLD_IFS=$IFS
+	IFS='	' #tab
+
+	while read moveName_menu moveType_menu PP_menu PPMax_menu moveID_menu; do
+		((count++))
+		if [ "$moveType_menu" == "null" ]; then
+			menu_upper_limit=$count
+			IFS=$IFS_OLD
+			break
+		fi
+	done < "$generated_move_menu"
+
+	IFS=$IFS_OLD
+}
+
+
+read_generated_move_menu(){
+
+	OLD_IFS=$IFS
+	IFS='	' # tab
+	local count=0
+
+	while read moveName_menu_ moveType_menu_ PP_menu_ PPMax_menu_ moveID_menu_; do
+
+		((count++))
+		moveName_menu="$moveName_menu_"
+		moveType_menu="$moveType_menu_"
+		PP_menu="$PP_menu_"
+		PPMax_menu="$PPMax_menu_"
+		moveID_menu="$moveID_menu_"
+
+		if [ $count -eq $where_selection_is ]; then
+			break
+		fi
+
+	done < "$generated_move_menu"
+
+	IFS=$IFS_OLD
+	
+}
+
+
+display_art(){
+
+	read_attribute_battleFile "${battle_filetmp_path}/PCPokemon.pokemon"
+	cat "${art_path}/${pokemonID}.art"
+	echo ""
+}

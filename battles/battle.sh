@@ -8,14 +8,16 @@ source "${HOME}/pokemon/gui/battles/battle_tools.sh"
 source "${HOME}/pokemon/gui/battles/battle_gui.sh"
 
 
-# Below is the beginning of the battle menu. Still plenty to do.
+# Below is the beginning of the battle move menu. Still plenty to do.
 while :
 do
 
 	clear
-	generate_move_info_box "NORMAL" 28 40
-	generate_move_menu
+	keep_move_menu_selection_in_range
+	generate_move_info_box
+	generate_move_menu # We only really need to do this once, consider moving this outside of the loop.
 	refresh_menu
+	display_art
 	paste "$generated_move_menu_marked" "$battle_menu_move_info"
 
 	read -n1 input

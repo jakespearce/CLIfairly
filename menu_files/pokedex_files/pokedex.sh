@@ -114,7 +114,7 @@ select_pokemon(){
 
 	((count++))
 	if [ "$count" -eq "$selected_pokemon" ]; then
-		bash "${pokedex_files}/select_pokedex_pokemon.sh" $name $seen $own
+		bash "${pokedex_files}/select_pokedex_pokemon.sh" $id $seen $own
 	fi	
 
 	done < "${pokedex_files}/pokedex"

@@ -2,7 +2,7 @@
 
 art_files="${HOME}/pokemon/gui/pokemon_database/art"
 data_files="${HOME}/pokemon/gui/menu_files/pokedex_files/pokedex_db/data"
-name=$1
+pokemonID=$1
 seen=$2
 own=$3
 
@@ -13,7 +13,7 @@ if [ "$seen" -eq 0 ]; then
 # if we've seen but don't own
 elif [ "$seen" -eq 1 -a "$own" -eq 0 ]; then
 	clear
-	cat ${art_files}/${name}.art
+	cat ${art_files}/${pokemonID}.art
 	cat ${data_files}/NOT_CAUGHT.data
 	
 	read -n1 input < /dev/tty
@@ -23,15 +23,15 @@ elif [ "$seen" -eq 1 -a "$own" -eq 0 ]; then
 # only other option is if we've seen AND own it
 else
 	clear
-	cat ${art_files}/${name}.art
-	cat ${data_files}/${name}1.data
+	cat ${art_files}/${pokemonID}.art
+	cat ${data_files}/${pokemonID}1.data
 	printf '							\e[5;32;40m▼\e[m\n'
 	
 	read -n1 input < /dev/tty
 
 	clear
-	cat ${art_files}/${name}.art
-	cat ${data_files}/${name}2.data
+	cat ${art_files}/${pokemonID}.art
+	cat ${data_files}/${pokemonID}2.data
 
 	read -n1 input < /dev/tty
 

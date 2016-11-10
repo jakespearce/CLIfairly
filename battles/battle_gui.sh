@@ -9,6 +9,7 @@ art_path="${HOME}/pokemon/gui/pokemon_database/art"
 battle_menu_move_info="/dev/shm/battle_menu_move_info"
 generated_move_menu="/dev/shm/generated_move_menu"
 generated_move_menu_marked="/dev/shm/generated_move_menu_marked"
+main_battle_menu_components="${HOME}/pokemon/gui/battles/battle_menu/main_battle_menu_components"
 
 #---- Sources ----#
 # We source calculate_whitespace from here
@@ -236,4 +237,55 @@ display_art(){
 	read_attribute_battleFile "${battle_filetmp_path}/PCPokemon.pokemon"
 	cat "${art_path}/${pokemonID}.art"
 	echo ""
+}
+
+
+#---- Main Battle Menu functions ----#
+
+
+display_main_battle_menu(){
+
+	cat "${main_battle_menu_components}/${main_battle_menu_selection}.menu"
+}
+
+set_main_battle_menu_selection(){
+
+	input="$1"
+	main_battle_menu_selection="$2"
+	
+	if [ "$input" == "w" ]; then
+		case "$main_battle_menu_selection" in
+			FIGHT) : ;;
+			pKmN) : ;;
+			ITEM) main_battle_menu_selection="FIGHT" ;;
+			RUN) main_battle_menu_selection="pKmN" ;;
+		esac
+
+	elif [ "$input" == "d" ]; then
+			case "$main_battle_menu_selection" in
+			FIGHT) main_battle_menu_selection="pKmN" ;;
+			pKmN) : ;;
+			ITEM) main_battle_menu_selection="RUN" ;;
+			RUN) : ;;
+		esac
+
+	elif [ "$input" == "s" ]; then
+			case "$main_battle_menu_selection" in
+			FIGHT) main_battle_menu_selection="ITEM" ;;
+			pKmN) main_battle_menu_selection="RUN" ;;
+			ITEM) : ;;
+			RUN) : ;;
+		esac
+
+	elif [ "$input" == "a" ]; then
+			case "$main_battle_menu_selection" in
+			FIGHT) : ;;
+			pKmN) main_battle_menu_selection="FIGHT" ;;
+			ITEM) : ;;
+			RUN) main_battle_menu_selection="ITEM" ;;
+		esac
+
+	fi
+	
+
 }

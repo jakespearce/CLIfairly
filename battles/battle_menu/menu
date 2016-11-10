@@ -1,5 +1,45 @@
-0-------------------------0
-|   1) FIGHT    2) pKmN   |
-|                         |
-|   3) ITEM     4) RUN    |
-0-------------------------0
+0------------------0
+| 1) FIGHT 2) pKmN |
+|                  |
+| 3) ITEM  4) RUN  |
+0------------------0
+
+Note: This should be 20 across
+
+Alternatively, if we're going with the non-lame idea:
+
+0------------------0
+|  FIGHT    pKmN   |
+|                  |
+|  ITEM     RUN    |
+0------------------0
+
+When the cursor is over the menu items:
+
+0------------------0
+| >FIGHT    pKmN   |
+|                  |
+|  ITEM     RUN    |
+0------------------0
+
+0------------------0
+|  FIGHT   >pKmN   |
+|                  |
+|  ITEM     RUN    |
+0------------------0
+
+0------------------0
+|  FIGHT    pKmN   |
+|                  |
+| >ITEM     RUN    |
+0------------------0
+
+0------------------0
+|  FIGHT    pKmN   |
+|                  |
+|  ITEM    >RUN    |
+0------------------0
+
+
+
+

@@ -634,6 +634,32 @@ leech_seed_check(){
 }
 
 
+#---- DECISIONS FOR THE NPC ----#
+select_random_move(){
+
+	read_attribute_battleFile "${battle_filetmp_path}/NPCPokemon.pokemon"
+
+	declare -a moveArray=( $moveOne $moveTwo $moveThree $moveFour )
+	declare -a ppArray=( $moveOnePP $moveTwoPP $moveThreePP $moveFourPP )
+
+	randomIndex=$( shuf -i 0-3 | head -1 )
+	randomlySelectedMove=${ppArray[$randomIndex]}
+
+	if [ "$randomlySelectedMove" -eq "$randomlySelectedMove" ] 2>/dev/null; then
+		if [ $randomlySelectedMove -gt 0 ]; then
+			: # Or do we have to set it to a different variable here?
+		else
+			select_random_move
+		fi
+	else
+		select_random_move
+	fi
+
+	# At this point we have the correct $randomIndex which we just apply to moveArray to get the right move index
+	# Re-use randomlySelectedMove cos why not
+	randomlySelectedMove=${moveArray[$randomIndex]}
+}
+
 
 #---- FUNCTIONS THAT DEAL WITH TIMING/THE STACK----#
 # the stack is a cool term that i appropriated from magic the gathering
@@ -644,7 +670,7 @@ read_actionStack(){
 
 	IFS_OLD=$IFS
 	IFS='	' #tab
-	while read actionID priority scriptVariable playerID; do
+	while read actionID priority scriptVariable playerID counterVariable; do
 		if [ "$playerID" == "PC" ]; then
 			PCaction="$actionID"
 			PCpriority="$priority"
@@ -660,6 +686,59 @@ read_actionStack(){
 
 	echo -e "PCaction is ${PCaction}, PCpriority is ${PCpriority}.\nNPCaction is ${NPCaction}. NPC priority is ${NPCpriority}."
 }
+
+
+# If NPC or PC action variable is unpopulated then we know they have no action in the actionStack
+check_actionStack_for_actions(){
+
+	read_actionStack
+	[[ -z "$PCaction" ]] && PCactionStack="unpopulated" || PCactionStack="populated"
+	[[ -z "$NPCaction" ]] && NPCactionStack="unpopulated" || NPCactionStack="populated"
+
+	# Uncomment for testing
+#	echo $PCactionStack
+#	echo $NPCactionStack
+}
+
+# Should both parties pick attack (which defaults to priority 1) then priority is adjusted based on speed stat
+# The loser in this comparison gets their action priority in the actionStack (attack in this case) set to 2
+# Sets a variable $priority which indicates who goes first.
+determine_attack_priority(){
+
+	read_attribute_battleFile "${battle_filetmp_path}/PCPokemon.pokemon"
+	PCspeed="$speed"
+	read_attribute_battleFile "${battle_filetmp_path}/NPCPokemon.pokemon"
+	NPCspeed="$speed"
+
+	if [ $PCspeed -gt $NPCspeed ]; then
+		PCpriority=1 && NPCpriority=2
+
+	elif [  $NPCspeed -gt $PCspeed]; then
+		NPCpriority=1 && PCpriority=2
+
+	elif [ $PCspeed -eq $NPCspeed ]; then
+		local randomValue=$( shuf -i 1-2 | head -1 )
+		case $randomValue in
+			1) PCpriority=1 && NPCpriority=2 ;;
+			2) NPCpriority=1 && PCpriority=2 ;;
+		esac
+	fi
+
+}
+
+# This function writes actions to the actionStack /battles/tmp_files/actionStack.tab
+# Only NPCPokemon write Item or Run to the actionStack (Run needs more research though)
+#write_to_actionStack(){
+#
+#	
+#}
+
+# Called when an attack is selected by the player
+# Determines attacking priorities, w
+#configure_actionStack(){
+#
+#
+#}
 
 
 # Occurs between move ticks and the decision phase
@@ -742,3 +821,4 @@ execute_action(){
 #burn_check NPCPokemon
 #leech_seed_check NPCPokemon PCPokemon
 #pokemon_attribute_tick "NPCPokemon"
+#check_actionStack_for_actions

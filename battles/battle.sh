@@ -26,6 +26,7 @@ move_battle_menu(){
 		case $input in
 			w) where_selection_is=$(( $where_selection_is - 1 )) ;;
 			s) where_selection_is=$(( $where_selection_is + 1 )) ;;
+			e) PC_select_move ; break ;;
 			q) return 0 ;;
 		esac
 	done

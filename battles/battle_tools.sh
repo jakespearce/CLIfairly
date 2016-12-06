@@ -634,7 +634,25 @@ leech_seed_check(){
 }
 
 
+#---- DECISIONS FOR THE PC ---#
+
+# Triggered in battle.sh when the PC selects a move.
+# Writes a line to the actionStack
+PC_select_move(){
+
+	read_attribute_battleFile "${battle_filetmp_path}/PCPokemon.pokemon"
+	declare -a moveArrayPC=( $moveOne $moveTwo $moveThree $moveFour )
+	echo $where_selection_is
+	echo ${moveArrayPC[$where_selection_is - 1]}
+
+	write_to_actionStack 1 1 ${moveArrayPC[$where_selection_is - 1]} "PC" 0
+
+}
+
+
 #---- DECISIONS FOR THE NPC ----#
+# randomlySelectedMove is a move that has PP and isn't disabled.
+# WARNING: If the pokemon has no available moves left this will loop forever
 select_random_move(){
 
 	read_attribute_battleFile "${battle_filetmp_path}/NPCPokemon.pokemon"
@@ -663,6 +681,30 @@ select_random_move(){
 
 #---- FUNCTIONS THAT DEAL WITH TIMING/THE STACK----#
 # the stack is a cool term that i appropriated from magic the gathering
+
+# Empties the actionStack file
+clear_actionStack(){
+
+	> "$actionStackFile"
+}
+
+# Writes to the actionStack. Creates an actionStack file if it doesn't exist.
+write_to_actionStack(){
+
+	actionID="$1"
+	priority="$2"
+	scriptVariable="$3"
+	playerID="$4"
+	counterVariable="$5"
+
+	if [ -e "$actionStackFile" ]; then
+		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" >> "$actionStackFile"
+	else
+		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" > "$actionStackFile"
+	fi
+
+}
+
 
 # This function reads the actionStack.tab file 
 # It extracts variables from the values written to that file.
@@ -726,12 +768,6 @@ determine_attack_priority(){
 
 }
 
-# This function writes actions to the actionStack /battles/tmp_files/actionStack.tab
-# Only NPCPokemon write Item or Run to the actionStack (Run needs more research though)
-#write_to_actionStack(){
-#
-#	
-#}
 
 # Called when an attack is selected by the player
 # Determines attacking priorities, w
@@ -822,3 +858,5 @@ execute_action(){
 #leech_seed_check NPCPokemon PCPokemon
 #pokemon_attribute_tick "NPCPokemon"
 #check_actionStack_for_actions
+#write_to_actionStack 1 2 33 NPC 1
+

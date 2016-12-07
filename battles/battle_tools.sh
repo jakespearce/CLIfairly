@@ -10,6 +10,8 @@ type_value_key="${HOME}/pokemon/gui/tools/type_value_key_lookup.tab"
 type_matchups_array="${HOME}/pokemon/gui/battles/arrays/type_matchups.cfg"
 base_stats_path="${HOME}/pokemon/gui/pokemon_database/base_stats/"
 actionStackFile="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tab"
+actionStackFile_tmp="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tmp"
+
 
 source "$type_matchups_array"
 source "${HOME}/pokemon/gui/tools/tools.sh"
@@ -645,9 +647,24 @@ PC_select_move(){
 	echo $where_selection_is
 	echo ${moveArrayPC[$where_selection_is - 1]}
 
-	write_to_actionStack 1 1 ${moveArrayPC[$where_selection_is - 1]} "PC" 0
+	write_to_actionStack 1 1 ${moveArrayPC[$where_selection_is - 1]} "PC" 0 "$actionStackFile"
 
+	# Function below checks the actionStack for NPC actions and makes a decision if it doesn't have a move in the stack yet.
+	full_battle_sequence
 }
+
+
+
+#---- FUNCTIONS FOR SEQUENCING EVENTS (FUNCTIONS THAT CALL OTHER FUNCTIONS IN THE RIGHT ORDER ----#
+
+# Called when a PC selects a move
+full_battle_sequence(){
+
+	# checks the stack for actions and then 
+	NPC_decide_actions_and_write_to_stack_if_possible
+	rewrite_actionStack_with_corrected_priorities
+}
+
 
 
 #---- DECISIONS FOR THE NPC ----#
@@ -679,6 +696,38 @@ select_random_move(){
 }
 
 
+
+# Selects a move and writes the move to the actionStack
+#TODO This function will need logic for wild pokemon, trainer pokemon etc.
+#TODO For now this function will just select a random move because our aspirations thus far are low.
+NPC_select_move(){
+
+	select_random_move
+	write_to_actionStack 1 1 "$randomlySelectedMove" "NPC" 0 "$actionStackFile"
+}
+
+
+#TODO Will handle decision making. This ties in closely with who the fight is with, eg. A wild pokemon can only
+# decide to run or fight whereas a juggle might switch out pokemon more often.
+# For now this just selects a move.
+NPC_make_decision(){
+
+	NPC_select_move	
+}
+
+
+# Called twice per battle loop: Once after the moveTick is complete and once after the player selects an action.
+NPC_decide_actions_and_write_to_stack_if_possible(){
+
+	check_actionStack_for_actions
+
+	# $NPCactionStack is obtained from check_actionStack_for_actions
+	if [ "$NPCactionStack" == "unpopulated" ]; then
+		NPC_make_decision
+	fi
+}
+
+
 #---- FUNCTIONS THAT DEAL WITH TIMING/THE STACK----#
 # the stack is a cool term that i appropriated from magic the gathering
 
@@ -696,11 +745,12 @@ write_to_actionStack(){
 	scriptVariable="$3"
 	playerID="$4"
 	counterVariable="$5"
+	actionStackFile_toWrite="$6"
 
-	if [ -e "$actionStackFile" ]; then
-		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" >> "$actionStackFile"
+	if [ -e "$actionStackFile_toWrite" ]; then
+		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" >> "$actionStackFile_toWrite"
 	else
-		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" > "$actionStackFile"
+		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" > "$actionStackFile_toWrite"
 	fi
 
 }
@@ -717,16 +767,19 @@ read_actionStack(){
 			PCaction="$actionID"
 			PCpriority="$priority"
 			PCscriptVariable="$scriptVariable"
+			PCcounterVariable="$counterVariable"
 		elif [ "$playerID" == "NPC" ]; then
 			NPCaction="$actionID"
 			NPCpriority="$priority"
 			NPCscriptVariable="$scriptVariable"
+			NPCcounterVariable="$counterVariable"
 		fi
 	done < "$actionStackFile"
 	IFS=$IFS_OLD
 
 
-	echo -e "PCaction is ${PCaction}, PCpriority is ${PCpriority}.\nNPCaction is ${NPCaction}. NPC priority is ${NPCpriority}."
+	# Uncomment for testing
+#	echo -e "PCaction is ${PCaction}, PCpriority is ${PCpriority}.\nNPCaction is ${NPCaction}. NPC priority is ${NPCpriority}."
 }
 
 
@@ -753,21 +806,45 @@ determine_attack_priority(){
 	NPCspeed="$speed"
 
 	if [ $PCspeed -gt $NPCspeed ]; then
-		PCpriority=1 && NPCpriority=2
+		PCpriority_determined=1 && NPCpriority_determined=2
 
-	elif [  $NPCspeed -gt $PCspeed]; then
-		NPCpriority=1 && PCpriority=2
+	elif [ $NPCspeed -gt $PCspeed ]; then
+		NPCpriority_determined=1 && PCpriority_determined=2
 
 	elif [ $PCspeed -eq $NPCspeed ]; then
 		local randomValue=$( shuf -i 1-2 | head -1 )
 		case $randomValue in
-			1) PCpriority=1 && NPCpriority=2 ;;
-			2) NPCpriority=1 && PCpriority=2 ;;
+			1) PCpriority_determined=1 && NPCpriority_determined=2 ;;
+			2) NPCpriority_determined=1 && PCpriority_determined=2 ;;
 		esac
 	fi
 
 }
 
+
+# If both players have a move on the actionStack then rewrite the actionStack with corrected priorities
+# 
+rewrite_actionStack_with_corrected_priorities(){
+
+	read_actionStack
+
+	if [ $PCaction -eq 1 -a $NPCaction -eq 1 ]; then
+
+		determine_attack_priority
+
+		write_to_actionStack 1 "$PCpriority_determined" "$PCscriptVariable" 'PC' "$PCcounterVariable" "$actionStackFile_tmp"
+
+		write_to_actionStack 1 "$NPCpriority_determined" "$NPCscriptVariable" 'NPC' "$NPCcounterVariable" "$actionStackFile_tmp"
+
+		mv "$actionStackFile_tmp" "$actionStackFile"
+
+	else
+
+		echo "One or both of them didn't choose to attack"
+	fi
+
+	
+}
 
 # Called when an attack is selected by the player
 # Determines attacking priorities, w
@@ -858,5 +935,7 @@ execute_action(){
 #leech_seed_check NPCPokemon PCPokemon
 #pokemon_attribute_tick "NPCPokemon"
 #check_actionStack_for_actions
-#write_to_actionStack 1 2 33 NPC 1
+#write_to_actionStack 1 2 33 NPC 1 "$actionStackFile"
+#NPC_decide_actions_and_write_to_stack_if_possible
+#rewrite_actionStack_with_corrected_priorities
 

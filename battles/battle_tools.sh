@@ -642,12 +642,14 @@ leech_seed_check(){
 # Writes a line to the actionStack
 PC_select_move(){
 
+	clear_actionStack
+
 	read_attribute_battleFile "${battle_filetmp_path}/PCPokemon.pokemon"
 	declare -a moveArrayPC=( $moveOne $moveTwo $moveThree $moveFour )
 	echo $where_selection_is
 	echo ${moveArrayPC[$where_selection_is - 1]}
 
-	write_to_actionStack 1 1 ${moveArrayPC[$where_selection_is - 1]} "PC" 0 "$actionStackFile"
+	write_to_actionStack 1 1 ${moveArrayPC[$where_selection_is - 1]} "PCPokemon" 0 "$actionStackFile"
 
 	# Function below checks the actionStack for NPC actions and makes a decision if it doesn't have a move in the stack yet.
 	full_battle_sequence
@@ -660,9 +662,10 @@ PC_select_move(){
 # Called when a PC selects a move
 full_battle_sequence(){
 
-	# checks the stack for actions and then 
+	# checks the stack for actions and then makes a decision and writes that decision to the stack.
 	NPC_decide_actions_and_write_to_stack_if_possible
 	rewrite_actionStack_with_corrected_priorities
+	execute_action
 }
 
 
@@ -703,7 +706,7 @@ select_random_move(){
 NPC_select_move(){
 
 	select_random_move
-	write_to_actionStack 1 1 "$randomlySelectedMove" "NPC" 0 "$actionStackFile"
+	write_to_actionStack 1 1 "$randomlySelectedMove" "NPCPokemon" 0 "$actionStackFile"
 }
 
 
@@ -719,8 +722,8 @@ NPC_make_decision(){
 # Called twice per battle loop: Once after the moveTick is complete and once after the player selects an action.
 NPC_decide_actions_and_write_to_stack_if_possible(){
 
+	unset NPCaction
 	check_actionStack_for_actions
-
 	# $NPCactionStack is obtained from check_actionStack_for_actions
 	if [ "$NPCactionStack" == "unpopulated" ]; then
 		NPC_make_decision
@@ -763,12 +766,12 @@ read_actionStack(){
 	IFS_OLD=$IFS
 	IFS='	' #tab
 	while read actionID priority scriptVariable playerID counterVariable; do
-		if [ "$playerID" == "PC" ]; then
+		if [ "$playerID" == "PCPokemon" ]; then
 			PCaction="$actionID"
 			PCpriority="$priority"
 			PCscriptVariable="$scriptVariable"
 			PCcounterVariable="$counterVariable"
-		elif [ "$playerID" == "NPC" ]; then
+		elif [ "$playerID" == "NPCPokemon" ]; then
 			NPCaction="$actionID"
 			NPCpriority="$priority"
 			NPCscriptVariable="$scriptVariable"
@@ -818,12 +821,11 @@ determine_attack_priority(){
 			2) NPCpriority_determined=1 && PCpriority_determined=2 ;;
 		esac
 	fi
-
 }
 
 
-# If both players have a move on the actionStack then rewrite the actionStack with corrected priorities
-# 
+# If both players have a move on the actionStack then rewrite the actionStack with corrected priorities 
+#TODO Expand this later on to consider correcting the priorities of item usage etc.
 rewrite_actionStack_with_corrected_priorities(){
 
 	read_actionStack
@@ -832,27 +834,114 @@ rewrite_actionStack_with_corrected_priorities(){
 
 		determine_attack_priority
 
-		write_to_actionStack 1 "$PCpriority_determined" "$PCscriptVariable" 'PC' "$PCcounterVariable" "$actionStackFile_tmp"
-
-		write_to_actionStack 1 "$NPCpriority_determined" "$NPCscriptVariable" 'NPC' "$NPCcounterVariable" "$actionStackFile_tmp"
+		order_write_to_actionStack
 
 		mv "$actionStackFile_tmp" "$actionStackFile"
 
 	else
 
 		echo "One or both of them didn't choose to attack"
-	fi
-
-	
+	fi	
 }
 
-# Called when an attack is selected by the player
-# Determines attacking priorities, w
-#configure_actionStack(){
-#
-#
-#}
 
+# Since the action to be executed first is ALWAYS at the top of the stack we write it to the stack in order
+order_write_to_actionStack(){
+
+	if [ $NPCpriority_determined -le $PCpriority_determined ]; then
+
+		write_to_actionStack 1 "$NPCpriority_determined" "$NPCscriptVariable" 'NPCPokemon' "$NPCcounterVariable" "$actionStackFile_tmp"
+		write_to_actionStack 1 "$PCpriority_determined" "$PCscriptVariable" 'PCPokemon' "$PCcounterVariable" "$actionStackFile_tmp"
+
+	else
+
+		write_to_actionStack 1 "$PCpriority_determined" "$PCscriptVariable" 'PCPokemon' "$PCcounterVariable" "$actionStackFile_tmp"
+		write_to_actionStack 1 "$NPCpriority_determined" "$NPCscriptVariable" 'NPCPokemon' "$NPCcounterVariable" "$actionStackFile_tmp"
+
+	fi
+}
+
+
+# The first line of the actionStack is always the one we want to execute.
+# We always want to delete a line in the actionStack after it has been executed.
+#TODO consider converting the regular read_actionStack to do what this script does but with a line to read up to that
+# can be passed as an argument.
+read_first_line_actionStack(){
+
+	IFS_OLD=$IFS
+	IFS='	' #tab
+	while read actionID priority scriptVariable playerID counterVariable; do
+
+		actionID_toExecute=$actionID
+		priority_toExecute=$priority
+		scriptVariable_toExecute=$scriptVariable
+		playerID_toExecute=$playerID
+		counterVariable_toExecute=$counterVariable
+
+		break
+
+	done < "$actionStackFile"
+	IFS=$IFS_OLD
+}
+
+
+execute_action(){
+
+	read_first_line_actionStack
+
+	if [ $actionID_toExecute -eq 1 ]; then
+
+		execute_attack "$scriptVariable_toExecute" "$playerID_toExecute" "$counterVariable_toExecute"
+
+	elif [ $actionID_toExecute -eq 2 ]; then
+		: # Item?
+
+	fi
+}
+
+
+execute_attack(){
+
+	local moveToUse="$1"
+	local attackingPokemon="$2"
+	local attackArgument="$3"
+
+	if [ "$attackingPlayer" == "PCPokemon" ]; then
+		defendingPokemon="NPCPokemon"
+	else
+		defendingPokemon="PCPokemon"
+	fi
+
+	bash "${moves_script_path}/${moveToUse}.sh" "$attackingPokemon" "$defendingPokemon"
+
+}
+
+
+# This function executes things described in the actionStack for a given player
+# Not sure where we'll get the $playerID argument from yet, probably somewhere else
+#TODO So far we only have ways of executing attacks. We'll eventually need to add item usage and running.
+#execute_action "PCPokemon" "$PCaction" "$PCscriptVariable"
+_execute_action(){
+
+	local playerID="$1"
+	local actionID="$2"
+	local scriptVariable="$3"
+
+	# First, the case that the action is to attack
+	if [ "$actionID" -eq 1 ]; then
+
+		if [ "$playerID" == "PC" ]; then
+			attackingPokemon="PCPokemon"
+			defendingPokemon="NPCPokemon"
+		else
+			attackingPokemon="NPCPokemon"
+			defendingPokemon="PCPokemon"
+		fi	
+
+	bash "${moves_script_path}/${scriptVariable}.sh" "$attackingPokemon" "$defendingPokemon"
+
+	fi
+}
 
 # Occurs between move ticks and the decision phase
 # Ticks down pokemon attributes: confusion, sleepCounter, reflect and lightScreen
@@ -885,32 +974,6 @@ pokemon_attribute_tick(){
 
 }
 
-# This function executes things described in the actionStack for a given player
-# Not sure where we'll get the $playerID argument from yet, probably somewhere else
-#TODO So far we only have ways of executing attacks. We'll eventually need to add item usage and running.
-#execute_action "PC" "$PCaction" "$PCscriptVariable"
-execute_action(){
-
-	local playerID="$1"
-	local actionID="$2"
-	local scriptVariable="$3"
-
-	# First, the case that the action is to attack
-	if [ "$actionID" -eq 1 ]; then
-
-		if [ "$playerID" == "PC" ]; then
-			attackingPokemon="PCPokemon"
-			defendingPokemon="NPCPokemon"
-		else
-			attackingPokemon="NPCPokemon"
-			defendingPokemon="PCPokemon"
-		fi	
-
-	bash "${moves_script_path}/${scriptVariable}.sh" "$attackingPokemon" "$defendingPokemon"
-
-	fi
-}
-
 
 # Example function calls for testing
 
@@ -928,7 +991,6 @@ execute_action(){
 #modifyAttributeByStage 'NPCPokemon' 'accuracy' 7
 #statStageModCheck 'NPCPokemon' 'evasion' 4
 #read_actionStack Warning - causes infinite loop
-#execute_action "PC" "$PCaction" "$PCscriptVariable" - Warning - causes infinite loop
 #pre_attack_status_checks NPCPokemon 44 ; echo "The value for skip_attack = ${skip_attack}. The reason for this is: ${skip_attack_cause}."
 #poison_check NPCPokemon
 #burn_check NPCPokemon
@@ -938,4 +1000,4 @@ execute_action(){
 #write_to_actionStack 1 2 33 NPC 1 "$actionStackFile"
 #NPC_decide_actions_and_write_to_stack_if_possible
 #rewrite_actionStack_with_corrected_priorities
-
+#read_first_line_actionStack

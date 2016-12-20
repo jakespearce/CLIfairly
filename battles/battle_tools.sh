@@ -11,6 +11,8 @@ type_matchups_array="${HOME}/pokemon/gui/battles/arrays/type_matchups.cfg"
 base_stats_path="${HOME}/pokemon/gui/pokemon_database/base_stats/"
 actionStackFile="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tab"
 actionStackFile_tmp="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tmp"
+moveTicksFile="${HOME}/pokemon/gui/battles/tmp_files/moveTicks.tab"
+
 
 
 source "$type_matchups_array"
@@ -636,6 +638,20 @@ leech_seed_check(){
 }
 
 
+# End of turn status checks: poison, burn and leech seed for each pokemon.
+EOT_status_checks(){
+
+	poison_check 'NPCPokemon'
+	burn_check  'NPCPokemon'
+	leech_seed_check  'NPCPokemon' 'PCPokemon'
+
+	poison_check 'PCPokemon'
+	burn_check 'PCPokemon'
+	leech_seed_check 'PCPokemon' 'NPCPokemon'
+
+}
+
+
 #---- DECISIONS FOR THE PC ---#
 
 # Triggered in battle.sh when the PC selects a move.
@@ -665,7 +681,22 @@ full_battle_sequence(){
 	# checks the stack for actions and then makes a decision and writes that decision to the stack.
 	NPC_decide_actions_and_write_to_stack_if_possible
 	rewrite_actionStack_with_corrected_priorities
+
+	# Uncomment for testing
+	cat "$actionStackFile"
+
 	execute_action
+	#TODO check_for_pokemon_death
+	clear_top_line_of_actionStack
+
+	# Uncomment for testing
+	cat "$actionStackFile"
+
+	execute_action 
+	EOT_status_checks 
+	clear_top_line_of_actionStack
+	#TODO moveTicks_write_to_actionStack
+	# 
 }
 
 
@@ -755,6 +786,46 @@ write_to_actionStack(){
 	else
 		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" > "$actionStackFile_toWrite"
 	fi
+
+}
+
+
+read_moveTicks(){
+
+	unset PCtickmoveID
+	unset PCtickCounter
+	unset NPCtickmoveID
+	unset NPCtickCounter
+
+	IFS_OLD=$IFS
+	IFS='	' #tab
+	while read tickmoveID tickCounter tickPlayerID; do
+		if [ "$tickPlayerID" == "PCPokemon" ]; then
+			PCtickmoveID="$tickmoveID"
+			PCtickCounter="$tickCounter"
+		elif [ "$tickPlayerID" == "NPCPokemon" ]; then
+			NPCtickmoveID="$tickmoveID"
+			NPCtickCounter="$tickCounter"
+		fi
+	done < "$moveTicksFile"
+	IFS=$IFS_OLD
+
+}
+
+
+# reads the moveTicks file and if there's something to write to the actionStack for a given player it does so.
+moveTicks_attempt_write_to_actionStack(){
+
+	read_moveTicks
+
+	if [ ! -z "$PCtickmoveID" ]; then
+		echo "1	1	${PCtickmoveID}	PCPokemon	${PCtickCounter}" >> "$actionStackFile"
+	fi
+
+	if [ ! -z "$NPCtickmoveID" ]; then
+		echo "1	1	${NPCtickmoveID}	NPCPokemon	${NPCtickCounter}" >> "$actionStackFile"
+	fi
+
 
 }
 
@@ -885,18 +956,30 @@ read_first_line_actionStack(){
 }
 
 
+# If there is only one line left of the actionStack then it leaves us with an empty file.
+# We don't want anything left in the stack if all actions have been executed.
+clear_top_line_of_actionStack(){
+
+	tail -n +2 "$actionStackFile" > "$actionStackFile_tmp"
+	mv "$actionStackFile_tmp" "$actionStackFile"
+}
+
+
 execute_action(){
 
 	read_first_line_actionStack
 
-	if [ $actionID_toExecute -eq 1 ]; then
+	if [ $actionID_toExecute -eq 1 ] 2>/dev/null; then
 
 		execute_attack "$scriptVariable_toExecute" "$playerID_toExecute" "$counterVariable_toExecute"
 
-	elif [ $actionID_toExecute -eq 2 ]; then
+	elif [ $actionID_toExecute -eq 2 ] 2>/dev/null; then
 		: # Item?
 
 	fi
+
+	unset actionID_toExecute
+
 }
 
 
@@ -1001,3 +1084,6 @@ pokemon_attribute_tick(){
 #NPC_decide_actions_and_write_to_stack_if_possible
 #rewrite_actionStack_with_corrected_priorities
 #read_first_line_actionStack
+#clear_top_line_of_actionStack
+#read_moveTicks
+moveTicks_attempt_write_to_actionStack

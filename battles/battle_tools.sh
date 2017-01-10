@@ -12,6 +12,7 @@ base_stats_path="${HOME}/pokemon/gui/pokemon_database/base_stats/"
 actionStackFile="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tab"
 actionStackFile_tmp="${HOME}/pokemon/gui/battles/tmp_files/actionStack.tmp"
 moveTicksFile="${HOME}/pokemon/gui/battles/tmp_files/moveTicks.tab"
+moveTicksFile_tmp="${HOME}/pokemon/gui/battles/tmp_files/moveTicks.tmp"
 
 
 
@@ -658,7 +659,8 @@ EOT_status_checks(){
 # Writes a line to the actionStack
 PC_select_move(){
 
-	clear_actionStack
+	# NOTE: Uncommented as it destroys things written to the actionStack by moveTicks.
+#	clear_actionStack
 
 	read_attribute_battleFile "${battle_filetmp_path}/PCPokemon.pokemon"
 	declare -a moveArrayPC=( $moveOne $moveTwo $moveThree $moveFour )
@@ -693,10 +695,16 @@ full_battle_sequence(){
 	cat "$actionStackFile"
 
 	execute_action 
-	EOT_status_checks 
+	#TODO check_for_pokemon_death
+
+	EOT_status_checks
+	#TODO check_for_pokemon_death
+
 	clear_top_line_of_actionStack
-	#TODO moveTicks_write_to_actionStack
-	# 
+	moveTicks_attempt_write_to_actionStack
+	tick_down_moveTicks_counters
+	#TODO moveTicks_write_to_actionStack - WHY IS THIS HERE? BATTLE SEQUENCE SEEMS TO BE FINISHED
+	cat "$actionStackFile"
 }
 
 
@@ -786,9 +794,7 @@ write_to_actionStack(){
 	else
 		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" > "$actionStackFile_toWrite"
 	fi
-
 }
-
 
 read_moveTicks(){
 
@@ -825,8 +831,32 @@ moveTicks_attempt_write_to_actionStack(){
 	if [ ! -z "$NPCtickmoveID" ]; then
 		echo "1	1	${NPCtickmoveID}	NPCPokemon	${NPCtickCounter}" >> "$actionStackFile"
 	fi
+}
 
 
+# For each line in moveTick file, tick down the counterVariable by 1
+# If the counterVariable reaches 0 then don't write the line back to the file
+tick_down_moveTicks_counters(){
+
+
+	# If file has any contents
+	if [ -s "$moveTicksFile" ]; then
+		IFS_OLD=$IFS
+		IFS='	' # tab
+
+		while read tickmoveID tickCounter tickPlayerID; do
+	
+			[[ $tickCounter -ge 1 ]] && ((tickCounter--))
+			if [ $tickCounter -gt 0 ]; then
+				echo "${tickmoveID}	${tickCounter}	${tickPlayerID}" >> "$moveTicksFile_tmp"
+			fi
+	
+		done < "$moveTicksFile"
+
+		[[ ! -e "$moveTicksFile_tmp" ]] && touch "$moveTicksFile_tmp"
+
+		mv "$moveTicksFile_tmp" "$moveTicksFile"
+	fi
 }
 
 
@@ -995,7 +1025,7 @@ execute_attack(){
 		defendingPokemon="PCPokemon"
 	fi
 
-	bash "${moves_script_path}/${moveToUse}.sh" "$attackingPokemon" "$defendingPokemon"
+	bash "${moves_script_path}/${moveToUse}.sh" "$attackingPokemon" "$defendingPokemon" "$attackArgument"
 
 }
 
@@ -1086,4 +1116,5 @@ pokemon_attribute_tick(){
 #read_first_line_actionStack
 #clear_top_line_of_actionStack
 #read_moveTicks
-moveTicks_attempt_write_to_actionStack
+#moveTicks_attempt_write_to_actionStack
+#tick_down_moveTicks_counters

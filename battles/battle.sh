@@ -10,6 +10,19 @@ source "${HOME}/pokemon/gui/battles/battle_gui.sh"
 
 move_battle_menu(){
 
+	# The menu will not display if the PC has an action in the actionStack
+	# check_actionStack for actions populates the PCactionStack variable.
+#	unset PCaction
+#	check_actionStack_for_actions
+#	if [ "$PCactionStack" == "populated" ]; then
+#		full_battle_sequence
+#		# Exit move_battle_menu function after a full battle sequence
+#		return 0
+#	fi
+
+	decide_if_PC_selects_move
+	if [ $exitMoveBattleMenu -eq 1 ]; then return 0; fi
+
 	# The move battle menu
 	while :
 	do

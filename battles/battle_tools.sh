@@ -543,6 +543,9 @@ pre_attack_status_checks(){
 	# Used for the disable check. If attack used = D then that move is disabled
 	attackUsed="$2"
 
+	unset skip_attack
+	unset skip_attack_cause
+
 	read_attribute_battleFile "${battle_filetmp_path}/${pokemonToCheck}.pokemon"
 	# variables extracted via this function that we care about:
 	# flinch, majorAilment, trapped, move{One,Two,Three,Four}PPMax (to check for the D which stands for disabled)
@@ -655,6 +658,23 @@ EOT_status_checks(){
 
 #---- DECISIONS FOR THE PC ---#
 
+
+# Stops the PC reaching the move selection menu under certain conditions eg. A multi-turn move like Fly
+# Called in the move_battle_menu function of battle.sh
+decide_if_PC_selects_move(){
+
+	unset exitMoveBattleMenu
+
+    unset PCaction
+    check_actionStack_for_actions
+    if [ "$PCactionStack" == "populated" ]; then
+        full_battle_sequence
+        # Exit move_battle_menu function after a full battle sequence
+        exitMoveBattleMenu=1
+    fi 
+}
+
+
 # Triggered in battle.sh when the PC selects a move.
 # Writes a line to the actionStack
 PC_select_move(){
@@ -687,14 +707,14 @@ full_battle_sequence(){
 	# Uncomment for testing
 	cat "$actionStackFile"
 
-	execute_action
+	execute_action_sequence
 	#TODO check_for_pokemon_death
 	clear_top_line_of_actionStack
 
 	# Uncomment for testing
 	cat "$actionStackFile"
 
-	execute_action 
+	execute_action_sequence 
 	#TODO check_for_pokemon_death
 
 	EOT_status_checks
@@ -995,12 +1015,13 @@ clear_top_line_of_actionStack(){
 }
 
 
-execute_action(){
+execute_action_sequence(){
 
 	read_first_line_actionStack
 
 	if [ $actionID_toExecute -eq 1 ] 2>/dev/null; then
 
+		pre_attack_status_checks "$playerID_toExecute" "$scriptVariable_toExecute"
 		execute_attack "$scriptVariable_toExecute" "$playerID_toExecute" "$counterVariable_toExecute"
 
 	elif [ $actionID_toExecute -eq 2 ] 2>/dev/null; then
@@ -1033,8 +1054,8 @@ execute_attack(){
 # This function executes things described in the actionStack for a given player
 # Not sure where we'll get the $playerID argument from yet, probably somewhere else
 #TODO So far we only have ways of executing attacks. We'll eventually need to add item usage and running.
-#execute_action "PCPokemon" "$PCaction" "$PCscriptVariable"
-_execute_action(){
+#execute_action_sequence "PCPokemon" "$PCaction" "$PCscriptVariable"
+_execute_action_sequence(){
 
 	local playerID="$1"
 	local actionID="$2"

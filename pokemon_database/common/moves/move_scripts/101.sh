@@ -11,7 +11,7 @@ nameOfAttack="Fly"
 
 # If $counterVariable is empty
 if [ -z $counterVariableArgument ]; then
-	echo "The counter variable is unset. This means the Pokemon is flying up high"
+	echo "The counter variable is unset. This means the Pokemon is flying up high. This is when we write a line to the moveTicks file."
 elif [ $counterVariableArgument -eq 1 ]; then
 	echo "This is when the Pokemon comes down for an attack"
 fi

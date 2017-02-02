@@ -41,6 +41,8 @@ generate_attribute_battleFile(){
 read_attribute_battleFile(){
 
 	fileToRead="$1"
+
+if [ -a "$fileToRead" ]; then
 	IFS_OLD=$IFS
 	IFS='	' #tab
 
@@ -95,6 +97,59 @@ read_attribute_battleFile(){
 	done < "$fileToRead"
 
 	IFS=$IFS_OLD
+fi
+
+}
+
+unset_attribute_battleFile_variables(){
+
+	unset pokemonID
+	unset pokemonUniqueID
+	unset pokemonName
+	unset level
+	unset HP
+	unset currentHP
+	unset attack_base
+	unset defense_base
+	unset special_base
+	unset speed_base
+	unset attack_stage
+	unset defense_stage
+	unset special_stage
+	unset speed_stage
+	unset attack
+	unset defense
+	unset special
+	unset speed
+	unset accuracy
+	unset evasion
+	unset crit_multiplier
+	unset typeOne
+	unset typeTwo
+	unset moveOne
+	unset moveTwo
+	unset moveThree
+	unset moveFour
+	unset moveOnePP
+	unset moveTwoPP
+	unset moveThreePP
+	unset moveFourPP
+	unset moveOnePPMax
+	unset moveTwoPPMax
+	unset moveThreePPMax
+	unset moveFourPPMax
+	unset majorAilment
+	unset confusion
+	unset trapped
+	unset seeded
+	unset substituted
+	unset flinch
+	unset semiInvulnerable
+	unset mist
+	unset lightScreen
+	unset reflect
+	unset sleepCounter
+
 }
 
 
@@ -174,7 +229,7 @@ accuracy_check(){
 
 	read_attribute_battleFile "${battle_filetmp_path}/${defendingPokemon}.pokemon"
 	# If the pokemon is semi-invulnerable then the move just doesn't hit
-	if [ $semiInvulnerable -eq 1 ]; then
+	if [ $semiInvulnerable -eq 1 ] 2>/dev/null; then
 		doesTheMoveHit="no"
 		return 0
 	fi
@@ -427,13 +482,13 @@ modify_HP_value(){
 	fi
 
 	# Empty the target attribute battle file
-#	> "${battle_filetmp_path}/${targetPokemon}.pokemon"
+	> "${battle_filetmp_path}/${targetPokemon}.pokemon"
 
-#	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
+	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
 
 
 
-	echo -e "The Pokemon's HP was modified by ${HPMod}. The original HP value was ${currentHP_forTesting}. The current HP is now ${currentHP}.\n\n"
+	echo -e "The Pokemon ${targetPokemon} HP was modified by ${HPMod}. The original HP value was ${currentHP_forTesting}. The current HP is now ${currentHP}.\n\n"
 }
 
 
@@ -488,7 +543,7 @@ deal_damage(){
 	if [ "$moveCategory" = "PHYSICAL" ]; then
 		defenderDefense=$defense
 
-		if [ $reflect -eq 1 ]; then
+		if [ $reflect -eq 1 ] 2>/dev/null; then
 			defenderDefense=$(( $defenderDefense * 2 ))
 		fi
 
@@ -519,7 +574,7 @@ deal_damage(){
 	damageToDeal=$( echo "${damageToDeal}/-1" | bc )
 
 	# Uncomment for testing
-	echo -e "\n==DAMAGE CALCULATION==\n\nLevel of attacker: ${levelAttacker}\nAttack of attacker: ${attackAttacker} (${moveCategory} - Category)\nDefense of defender: ${defenderDefense}\nAttack being used: ${moveName} (ID = ${moveID})\nBase power of move: ${movePower}\n\nMODIFIERS\n\nSTAB: ${STAB}\nType damage bonus: ${typeDamageBonus}\nThe random value: ${randomDamageMultiplier}\nThe total damage dealt by the ${moveName} attack: ${damageToDeal}\n\n"
+	echo -e "\n==DAMAGE CALCULATION==\n\nAttacking Pokemon: ${attackingPokemon}. Defending Pokemon: ${defendingPokemon}. \n\n Level of attacker: ${levelAttacker}\nAttack of attacker: ${attackAttacker} (${moveCategory} - Category)\nDefense of defender: ${defenderDefense}\nAttack being used: ${moveName} (ID = ${moveID})\nBase power of move: ${movePower}\n\nMODIFIERS\n\nSTAB: ${STAB}\nType damage bonus: ${typeDamageBonus}\nThe random value: ${randomDamageMultiplier}\nThe total damage dealt by the ${moveName} attack: ${damageToDeal}\n\n"
 
 	modify_HP_value "$defendingPokemon" "$damageToDeal"
 
@@ -535,9 +590,9 @@ deal_damage(){
 # Checks for ailments and decides whether a pokemon can attack this turn
 # Eg. Pokemon is Frozen, therefore it can't attack
 # Parameters: pokemonToCheck, attackUsed
-#pre_attack_status_checks NPCPokemon 44
+#pre_attack_status_check_sequence NPCPokemon 44
 
-pre_attack_status_checks(){
+pre_attack_status_check_sequence(){
 
 	pokemonToCheck="$1"
 	# Used for the disable check. If attack used = D then that move is disabled
@@ -580,7 +635,7 @@ pre_attack_status_checks(){
 	# Uncomment for testing - Note: Include this OUTSIDE of the function.
 	# echo "The value for skip_attack = ${skip_attack}. The reason for this is: ${skip_attack_cause}."
 }
-# Used by pre_attack_status_checks function
+# Used by pre_attack_status_check_sequence function
 set_skip_attack_and_cause(){
 
 	skip_attack=1
@@ -649,10 +704,104 @@ EOT_status_checks(){
 	burn_check  'NPCPokemon'
 	leech_seed_check  'NPCPokemon' 'PCPokemon'
 
+	unset_attribute_battleFile_variables
+
 	poison_check 'PCPokemon'
 	burn_check 'PCPokemon'
 	leech_seed_check 'PCPokemon' 'NPCPokemon'
 
+	unset_attribute_battleFile_variables
+
+}
+
+
+#---- Pokemon Fainting / death ---#
+
+
+# Checks to see if a given pokemon has fainted and if so:
+# 1) Clear actionStack for given pokemon
+# 2) Clear moveTicks for given pokemon
+# 3) Clear AttributeBattleFile for given pokemon
+# 3.5) Allocate xp as appropriate (only allocate XP to a PCPokemon)
+# TODO 4) Check the enemy trainer's roster for more pokemon to send out if trainer battle
+# 5) 
+
+
+faint_checks(){
+
+	pokemon_faints_if_necessary NPCPokemon
+	pokemon_faints_if_necessary PCPokemon
+}
+
+
+pokemon_faints_if_necessary(){
+
+	pokemonToCheck="$1"
+
+	faint_check "$pokemonToCheck"
+
+	if [ $pokemonHasFainted -eq 1 ] 2>/dev/null; then
+
+		faintedPokemon="$pokemonToCheck"
+
+		# Show graphics of Pokemon fucking dying here
+		# XP allocation script here
+		clear_actionStack_for_pokemon "$faintedPokemon"
+		clear_moveTicks_for_pokemon "$faintedPokemon"
+		delete_AttributeBattleFile_for_pokemon "$faintedPokemon"
+		# Here we attempt to send out a new Pokemon if it's a trainer battle
+		# If it's not a trainer battle just quit out to the map
+
+		# Stuff for testing
+		echo -e "\n\n POKEMON ${faintedPokemon} HAS BEEN DESTROYED. \n\n"
+
+	fi
+
+}
+
+# Checks to see whether a given pokemon has 0 HP
+# pokemonHasFainted=1 if pokemon has 0 HP
+faint_check(){
+
+	unset pokemonHasFainted
+	local pokemonToCheck="$1"
+	read_attribute_battleFile "${battle_filetmp_path}/${pokemonToCheck}.pokemon"
+
+	if [ $currentHP -le 0 ] 2>/dev/null; then
+		pokemonHasFainted=1
+		pokemonIDFaintedPokemon="$pokemonID" # For use in XP allocation
+		levelFaintedPokemon="$level" # For use in XP allocation
+	fi
+
+}
+
+# Clears the actionStack for a given pokemon
+clear_actionStack_for_pokemon(){
+
+	local pokemonToClear="$1"
+
+	grep -wv "$pokemonToClear" "$actionStackFile" > "$actionStackFile_tmp"
+	mv "$actionStackFile_tmp" "$actionStackFile"
+
+}
+
+# Clears the moveTicks for a given pokemon
+clear_moveTicks_for_pokemon(){
+
+	local pokemonToClear="$1"
+
+	grep -wv "$pokemonToClear" "$moveTicksFile" > "$moveTicksFile_tmp"
+	mv "$moveTicksFile_tmp" "$moveTicksFile"
+
+}
+
+# Deletes a given pokemon's AttributeBattleFile
+delete_AttributeBattleFile_for_pokemon(){
+
+	local pokemonToClear="$1"
+	if [ -e "${battle_filetmp_path}/${pokemonToClear}.pokemon" ]; then
+		rm "${battle_filetmp_path}/${pokemonToClear}.pokemon"
+	fi
 }
 
 
@@ -708,17 +857,17 @@ full_battle_sequence(){
 	cat "$actionStackFile"
 
 	execute_action_sequence
-	#TODO check_for_pokemon_death
+	faint_checks
 	clear_top_line_of_actionStack
 
 	# Uncomment for testing
 	cat "$actionStackFile"
 
 	execute_action_sequence 
-	#TODO check_for_pokemon_death
+	faint_checks
 
 	EOT_status_checks
-	#TODO check_for_pokemon_death
+	faint_checks
 
 	clear_top_line_of_actionStack
 	moveTicks_attempt_write_to_actionStack
@@ -1021,9 +1170,16 @@ execute_action_sequence(){
 
 	if [ $actionID_toExecute -eq 1 ] 2>/dev/null; then
 
-		pre_attack_status_checks "$playerID_toExecute" "$scriptVariable_toExecute"
-		execute_attack "$scriptVariable_toExecute" "$playerID_toExecute" "$counterVariable_toExecute"
+		# This sets skip_attack to 1 if the Pokemon needs to skip their attack because of a status (eg. FRZ)
+		pre_attack_status_check_sequence "$playerID_toExecute" "$scriptVariable_toExecute"
 
+		#TODO Here we need a function that ticks down status ailments that tick down eg. confusion, disabled
+
+		if [ "$skip_attack" != 1 ]; then
+			execute_attack "$scriptVariable_toExecute" "$playerID_toExecute" "$counterVariable_toExecute"
+		else
+			: #TODO Include a script with a GUI component (eg. Bulbasaur is frozen solid!)
+		fi
 	elif [ $actionID_toExecute -eq 2 ] 2>/dev/null; then
 		: # Item?
 
@@ -1040,7 +1196,7 @@ execute_attack(){
 	local attackingPokemon="$2"
 	local attackArgument="$3"
 
-	if [ "$attackingPlayer" == "PCPokemon" ]; then
+	if [ "$attackingPokemon" == "PCPokemon" ]; then
 		defendingPokemon="NPCPokemon"
 	else
 		defendingPokemon="PCPokemon"
@@ -1088,22 +1244,22 @@ pokemon_attribute_tick(){
 	read_attribute_battleFile "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	if [ $confusion -gt 0 ]; then
 		confusionValue=$(( --confusion ))
-		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t0\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t${lightScreen}\t${reflect}\t${sleepCounter}" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
 	if [ $sleepCounter -gt 0 ]; then
 		sleepCounterValue=$(( --sleepCounter ))
-		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t0\t0\t${sleepCounterValue}" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t0\t0\t0\t0\t0\t0\t${lightScreen}\t${reflect}t${sleepCounterValue}" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
 	if [ $lightScreen -gt 0 ]; then
 		lightScreenValue=$(( --lightScreen ))
-		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t${lightScreenValue}\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t0\t0\t0\t0\t0\t0\t${lightScreenValue}\t${reflect}\t${sleepCounter}" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
-	if [ $lightScreen -gt 0 ]; then
-		lightScreenValue=$(( --lightScreen ))
-		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusionValue}\t0\t0\t0\t0\t0\t0\t${lightScreenValue}\t0\t0" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
+	if [ $reflect -gt 0 ]; then
+		reflectValue=$(( --reflect ))
+		echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t6\t6\t${attack}\t${defense}\t${special}\t${speed}\t6\t6\t1\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t0\t0\t0\t0\t0\t0\t${lightScreen}\t${reflectValue}\t${sleepCounter}" >> "${battle_filetmp_path}/${tickingPokemon}.pokemon"
 	fi
 
 }
@@ -1125,7 +1281,7 @@ pokemon_attribute_tick(){
 #modifyAttributeByStage 'NPCPokemon' 'accuracy' 7
 #statStageModCheck 'NPCPokemon' 'evasion' 4
 #read_actionStack Warning - causes infinite loop
-#pre_attack_status_checks NPCPokemon 44 ; echo "The value for skip_attack = ${skip_attack}. The reason for this is: ${skip_attack_cause}."
+#pre_attack_status_check_sequence NPCPokemon 44 ; echo "The value for skip_attack = ${skip_attack}. The reason for this is: ${skip_attack_cause}."
 #poison_check NPCPokemon
 #burn_check NPCPokemon
 #leech_seed_check NPCPokemon PCPokemon
@@ -1139,3 +1295,9 @@ pokemon_attribute_tick(){
 #read_moveTicks
 #moveTicks_attempt_write_to_actionStack
 #tick_down_moveTicks_counters
+#clear_actionStack_for_pokemon PC
+#clear_moveTicks_for_pokemon PC
+#execute_action_sequence
+#EOT_status_checks
+#delete_AttributeBattleFile_for_pokemon PCPokemon
+#pokemon_faints_if_necessary PCPokemon

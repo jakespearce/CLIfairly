@@ -21,6 +21,7 @@ input_prompt(){
 		# map_rw_path needs to be located in /dev/shm in the future
 		e) clear ; cat "${map_rw_path}/marked_map_output" ; echo "" ; echo -n " " ; interaction ;;
 		m) bash ${HOME}/pokemon/gui/menu_files/menu.sh ; cat "${map_rw_path}/marked_map_output" ;;
+		p) bash ${HOME}/pokemon/gui/battles/battle.sh ;  cat "${map_rw_path}/marked_map_output" ;;
 		*) echo "WASD to move, e to interact with things, m for menu." ;;
 	esac
 }

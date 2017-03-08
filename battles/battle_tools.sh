@@ -230,6 +230,9 @@ accuracy_check(){
 	read_attribute_battleFile "${battle_filetmp_path}/${defendingPokemon}.pokemon"
 	# If the pokemon is semi-invulnerable then the move just doesn't hit
 	if [ $semiInvulnerable -eq 1 ] 2>/dev/null; then
+
+		echo -e "\n\nTHE MOVE JUST DOESN'T HIT BECAUSE THE POKEMON IS SEMIINVULNERABLE"
+
 		doesTheMoveHit="no"
 		return 0
 	fi
@@ -297,20 +300,20 @@ statStageModCheck(){
 # All this function does is modify an attribute, no checks to see if that attribute is lt 0 or gt 12 take place here.
 modifyAttributeByStage(){
 
-	targetPokemon="$1"
-	attributeToModify="$2"
-	modifierValue="$3"
+	local targetPokemon="$1"
+	local attributeToModify="$2"
+	local modifierValue="$3"
 
 
 	read_attribute_battleFile "${battle_filetmp_path}/${targetPokemon}.pokemon"
 
 	# The following block is for testing purposes
-	attack_stageOLD="$attack_stage"
-	defense_stageOLD="$defense_stage"
-	special_stageOLD="$special_stage"
-	speed_stageOLD="$speed_stage"
-	accuracyOLD="$accuracy"
-	evasionOLD="$evasion"
+	local attack_stageOLD="$attack_stage"
+	local defense_stageOLD="$defense_stage"
+	local special_stageOLD="$special_stage"
+	local speed_stageOLD="$speed_stage"
+	local accuracyOLD="$accuracy"
+	local evasionOLD="$evasion"
 	# /testing purposes block
 
 	case $attributeToModify in
@@ -322,7 +325,7 @@ modifyAttributeByStage(){
 		evasion) evasion=$(( $evasion + $modifierValue)) ;;
 	esac
 
-#	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
+	echo -e "${pokemonID}\t${pokemonUniqueID}\t${pokemonName}\t${level}\t${HP}\t${currentHP}\t${attack}\t${defense}\t${special}\t${speed}\t${attack_stage}\t${defense_stage}\t${special_stage}\t${speed_stage}\t${attack}\t${defense}\t${special}\t${speed}\t${accuracy}\t${evasion}\t${crit_multiplier}\t${typeOne}\t${typeTwo}\t${moveOne}\t${moveTwo}\t${moveThree}\t${moveFour}\t${moveOnePP}\t${moveTwoPP}\t${moveThreePP}\t${moveFourPP}\t${moveOnePPMax}\t${moveTwoPPMax}\t${moveThreePPMax}\t${moveFourPPMax}\t${majorAilment}\t${confusion}\t${trapped}\t${seeded}\t${substituted}\t${flinch}" >> "${battle_filetmp_path}/${1}.pokemon"
 
 
 	# Uncomment for testing
@@ -745,7 +748,7 @@ pokemon_faints_if_necessary(){
 		faintedPokemon="$pokemonToCheck"
 
 		# Show graphics of Pokemon fucking dying here
-		# XP allocation script here
+		# XP allocation function here
 		clear_actionStack_for_pokemon "$faintedPokemon"
 		clear_moveTicks_for_pokemon "$faintedPokemon"
 		delete_AttributeBattleFile_for_pokemon "$faintedPokemon"
@@ -964,6 +967,23 @@ write_to_actionStack(){
 		echo "${actionID}	${priority}	${scriptVariable}	${playerID}	${counterVariable}" > "$actionStackFile_toWrite"
 	fi
 }
+
+
+write_to_moveTicks(){
+
+	local attackBeingUsed="$1"
+	local counterVariable="$2"
+	local attackingPokemon="$3"
+
+	if [ -s "$moveTicksFile" ]; then
+		echo "${attackBeingUsed}	${counterVariable}	${attackingPokemon}" >> "$moveTicksFile"
+	else
+
+		echo "${attackBeingUsed}	${counterVariable}	${attackingPokemon}" > "$moveTicksFile"
+	fi
+
+}
+
 
 read_moveTicks(){
 
@@ -1232,6 +1252,39 @@ _execute_action_sequence(){
 
 	fi
 }
+
+
+#---- FUNCTIONS FOR USE IN MOVE SCRIPTS ----#
+
+accuracy_crit_damage(){
+
+	local attackingPokemon="$1"
+	local defendingPokemon="$2"
+	local attackBeingUsed="$3"
+	local nameOfAttack="$4"
+	local critRateMultiplierForMove="$5"
+
+	# Get attacker's species ID for the calculate_crit_bonus function
+	read_attribute_battleFile "${battle_filetmp_path}/${attackingPokemon}.pokemon"
+	attackerSpeciesID="$pokemonID"
+
+	# Determine whether the attack hits or not (returns the $doesTheMoveHit variable)
+	accuracy_check "$attackingPokemon" "$defendingPokemon" "$attackBeingUsed"
+
+	if [ "$doesTheMoveHit" == "yes"  ]; then
+		calculate_crit_bonus "$attackerSpeciesID" "$attackingPokemon" "$critRateMultiplierForMove"
+		deal_damage "$attackingPokemon" "$defendingPokemon" "$attackBeingUsed" "$criticalModifier"
+	elif [ "$doesTheMoveHit" == "no" ]; then
+	 	#NOTE Here temporarily for testing
+		echo "The attack missed! Write a function to call for this."
+	fi
+
+}
+
+
+
+
+
 
 # Occurs between move ticks and the decision phase
 # Ticks down pokemon attributes: confusion, sleepCounter, reflect and lightScreen

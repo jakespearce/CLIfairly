@@ -1,0 +1,121 @@
+What happens when a Pokemon dies?
+
+1- The Attribute BattleFile is deleted.
+(This clears all status ailments, resets all PP, a load of other things)
+2- If it has lines in the following files they get cleared:
+actionStack.tab
+moveTicks.tab
+3- If the pokemon is part of the enemie's roster then just delete it from that roster.
+4- If the pokemon is part of our roster then force a switch out to a healthy pokemon.
+
+
+
+Things to figure out:
+1) How the enemy pokemon roster will work
+2) How our roster will work
+
+
+Things to worry about now:
+A function(s) for NPC and PC that does the following:
+1- Deletes the AttributeBattleFile for that pokemon
+2- Clears:
+moveTicks.tab
+actionStack.tab
+of that pokemon's entries.
+
+What happens when the 
+1) actionStack entry
+2) AttributeBattleFile gets cleared for a pokemon and the full_battle_sequence runs?
+
+Things that happen to the PC Pokemon when it dies:
+-HP in the master file is set to 0
+-It's no longer part of the battle roster (if that's even a thing)
+
+Things that happen to the PC Pokemon when the enemy dies:
+-XP goes up
+
+IGNORE THINGS THAT HAPPEN WHEN THE PC POKEMON SIMPLY GETS SWAPPED OUT
+
+Todo next:
+-Simulate a Pokemon fucking dying in the middle of full_battle_sequence
+-See how it plays out. Build specs from there.
+
+Consideration: If we read_attribute_battleFile and there's no file there, do the variables stay populated from
+the last time that we read the file?
+To get around this we may want to write a function that unsets all of the variables that we obtain from
+read_attribute_battleFile.
+Same with read_moveTicks. A lot of these functions assume that the file they're trying to read exists.
+
+
+execute_action_sequence calls:
+()read_first_line_actionStack (there will be nothing here if the pokemon has died)
+does it pass?
+yes
+^ execute_action_sequence is fine, then.
+
+
+EOT_status_checks
+Run read_attribute_battleFIle on PC Pokemon and record a value then run it on NPC Pokemon after changign the 
+name of the attributeBattleFIle for that pokemon.
+
+It will moan about there being no such file or directory.
+Okay, it's finally time to write a function that unsets all of the variables that we obtain in the 
+read_attributeBattleFIle script.
+We also put an If statement around read_attribute_battleFile.
+
+tickdown_move_tick_counters
+Note; As long as we clear the line in the moveTicks file for the pokemon that just died then we'll be fine.
+
+
+Next: Now we actually write pokemon death:
+(See plan in paper notes.)
+
+0) Check if $target HP = 0
+IF true then:
+
+X1) Clear action stack for a given Pokemon
+X2) Clear move ticks for a given Pokemon
+3) Allocate correct XP to defending Pokemon
+4) Show the dead Pokemon just fucking dying
+5) Attempt to read the enemy's temp roster file and see if there's another pokemon that they can send out.
+6) If there isn't (which there won't be because we're just dealing with wild pokemon at the moment) just
+quit out of battle completely and head back to the map.
+
+
+Testing for the pokemon_faints_if_necessary script:
+
+Try: Putting something in the actionStack, something in the moveTicks and check the attribute battle file clearance
+1) AttributeBattleFile has been deleted
+2) actionStack has not been cleared
+3) moveTicks.tab has been cleared.
+
+
+Note: Lines 485 and 487 have been uncommented. (lines in the modify_HP_value function)
+
+TODO LIST:
+1- Write code that gets us into a battle with a random wild pokemon.
+2- Add data for Rattata and Pidgy.
+3- Write the Fly script and test it out.
+XXXX4- Write a function that writes lines to the moveTicks file.
+5- The functions at the end of battle_tools that set $reflect etc. need to NOT write \t0 and \t6. They should
+write the actual variables as this means these stats will just be reset every time we run this (I think)
+6- Write a container function in battle_tools to hold the code that goes from lines 16 to lines 24 of 33.sh as
+it seems like this will repeat itself in move scripts very often.
+7- May need a script for changing one of the pokemon's stats and having that change reflect in the
+AttributeBattleFile.
+8- Work the stat stages into the damage calculation
+
+
+
+Writing the Fly script
+Note: I don't think we have a script that writes to moveTicks.
+Note: We also need to input invulnerability into the pokemon that is flying.
+We need to unset invulnerability once the pokemon lands too.
+
+Writing lines to the moveTicks file:
+Are we ever going to have a situation where we attempt to write to moveticks twice with the same player?
+I don't think so.
+DONE
+
+
+
